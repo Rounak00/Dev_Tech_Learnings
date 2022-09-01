@@ -1,0 +1,33 @@
+ First we need to make a file as a git repo or we can say git type so we can use git commands.
+ 
+  > git  init => use to make a folder as a git repo
+  > git clone link => make a existing project as a git repo in your local machine
+ 
+ > ls => saw us list of folders
+ > git status => what are changess happened and are they in stage area or not
+ > git diff filename.fileext => show us what change happened in a particular file
+ 
+ Now we need to push changes in git so first need to make all changes in staging area them cimmit the changes
+ 
+ > git add filename.fileext / git add -A => for make all changes in staging
+ > git commit -m "messege" => commit all changes
+ > git log =>what are the commits happened (git log -3 // show us last three logs)
+ > git show gitcommitid => show us what change happened in a particular commit
+ 
+ 
+ Now lets talk about branches
+> git branch => show us all branches
+> git branch branchname =>build new branch
+> git branch branchname => go to that branch
+> git branch -d branchname => delete a branch
+> git merge branchname => that branchname branch will merged to your current branch
+
+> git reset --hard =>remove commit and code 
+> git reset --soft => remove only commit
+
+Now lets push all data to your local to github
+> git push
+Same like that from github to our local we will do
+> git pull
+
+ 
