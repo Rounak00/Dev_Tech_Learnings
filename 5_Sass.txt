@@ -1,1 +1,70 @@
+SASS => Syntactically Awesome Style Sheets
 
+//INSTALL (here its only write in Node but we can also use yarn)
+ *We need to have Node in our machine
+ *Need to install NPM
+ *install sass as => npm install node-sass --save-dev
+ 
+//File Structure
+  *make a folder sass/main.scss  //We will write our style code here
+
+//Run Sass or compile Sass
+  * we need to write our code in package.jason in section of script. ex: "Scripts":{"compile":"node-sass sass/main.scss css/style.css"}
+  * for compile we need to write npm run compile; (based on example of precious line)
+  NB: if we write -w at the end in script, then we dont need to compile everytime ex: {"compile":"node-sass sass/main.scss css/style.css -w"} (Work like nodemon)
+
+//Variables (container)
+   &name : red;
+   
+   NB: Doing math in your CSS is very helpful. Sass has a handful of standard math operators like +, -, *, math.div(), and %. Remember to add this header @use "sass:math";
+   
+
+//Mixin & Include (utility css code only)
+ =>   @mixin name{color:red;}
+      p{ @import name;}
+
+=>    @mixin name($val){color:$val} //with parameter
+
+
+
+//Nesting  (component with sub components)
+  * think there are li tags inside the ul tag
+    => ul{
+        li{}
+        }
+    =>  ul{
+           &hover{}
+           }
+           
+           
+           
+//Extend (inheritance)
+     %message-shared {
+        border: 1px solid #ccc;
+        padding: 10px;
+        color: #333;
+      }
+      .message {
+        @extend %message-shared;
+      }
+
+           
+           
+//Module (import)
+    // _base.scss
+        $font-stack: Helvetica, sans-serif;
+        $primary-color: #333;
+
+        body {
+          font: 100% $font-stack;
+          color: $primary-color;
+        }
+     // styles.scss
+        @import 'base';
+
+        .inverse {
+          background-color: base.$primary-color;
+          color: white;
+        }       
+        
+          
