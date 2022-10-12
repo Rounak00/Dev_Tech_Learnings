@@ -20,7 +20,7 @@
 //5> PROPS: easy just send your style in your tag and catch it in css using &{};
     <Container color="blue">
     const container=styled.div`
-            background-color=${(props)=>props.bg};  // we can use as destructure also ${({bg})=>bg}   
+            background-color=${(props)=>props.bg};  // we can use as destructure also ${({bg})=>bg}    => this is called destructuring
              `
 
 //6> THEME PROVIDER:
@@ -42,19 +42,22 @@
                      },
                    };
  
-       //4. Now we can access it
+       //4. Now we can access it (in any page)
                &{(props)=>props.t.color.color}
 
 
 
 
 
-7> GLOBAL STYLE
+7> GLOBAL STYLE (mainly use as index. css)
     it is just like external css
    import {createGlobalStyle} from "Styled-Components"; //import first
 
    export const GlobalStyle=createGlobalStyle`
      // your style
+     @import url('')
+     *{}
+     body{}
      `
   
     >> now in working file first import {globalstyle} from "./globalstyle";
