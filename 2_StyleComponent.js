@@ -22,8 +22,16 @@
     const container=styled.div`
             background-color=${(props)=>props.bg};  // we can use as destructure also ${({bg})=>bg}    => this is called destructuring
              `
-
-//6> THEME PROVIDER:
+//6>  EXTEND DESIGN:
+      
+      const Design=styled.p'color:red;'
+      const Design2=styled(Design)' extra css code'
+     
+//POLYPHORMIC PROP:
+      const D=styled.button'your css'
+       <D as='a'>  //here as='a' makes it a anchor tag in HTML file
+          </D>
+//7> THEME PROVIDER:
      
       //1. first import it
          import {ThemeProvider} from "styled-components";
@@ -49,7 +57,7 @@
 
 
 
-7> GLOBAL STYLE (mainly use as index. css)
+//8> GLOBAL STYLE (mainly use as index. css)
     it is just like external css
    import {createGlobalStyle} from "Styled-Components"; //import first
 
