@@ -53,7 +53,23 @@ IT is single theaded.
        TTL january // return us terminated time left (-1 means no key there, -2 means key deleted)
        SETEX december 10 "25" // set and expire it is in given time
        EXIT// exit from server cli
-       
+#Commands Related to pattern matching-
+        think we have those key and value pairs:= code:main "10", code:creator "11", code:mamamia "40", code:learn "70"
+         KEYS code* // return all kes with is code
+         KEYS code:[mc] // return code:mamamia, code:main, code:creator   
+         KEYS  code:????// 4 characters so return code:main
+#Commands on List-
+        LPUSH f mango [enter] //left push
+        LPUSH f apple [enter]
+        LPUSH f banana [enter]
+        LRANGE f 0 100// it will show all values thro 0 to 100 index
+        RPUSH f strawberry [enter] // right push
+        LPOP f [enter] // pop from fruits left most element
+        RPOP f [enter]// pop from fruits right most element
+        BLPOP f 5 [enter]// waiting 5 sec and then del if nothing there then it also wait 5 sec first then give null, during wating time if some one push something then it delete that
+        BRPOP f 5 [enter]
+        
+
 // implimentation with NODE
        const Redis=required('ioredis)
        console.log(Redis)// show everything
