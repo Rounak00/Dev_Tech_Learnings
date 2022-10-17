@@ -68,6 +68,10 @@ IT is single theaded.
         RPOP f [enter]// pop from fruits right most element
         BLPOP f 5 [enter]// waiting 5 sec and then del if nothing there then it also wait 5 sec first then give null, during wating time if some one push something then it delete that
         BRPOP f 5 [enter]
+ #commands on Set-
+        SADD f apple; //for add data , return 1 when added, return 0 when there already exist and no need to added
+        SMEMBER f// return apple
+        SCARD f // return set elements number
         
 
 // implimentation with NODE
