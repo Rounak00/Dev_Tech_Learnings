@@ -1,4 +1,5 @@
 Redis => Remote Dictionary Server (It is a key value no-sql database like a Object)
+IT is single theaded.
 
 *We dont say it is a database we will name it as a IN-MEMORY Database, bcz it stores inside of RAM, Thats why it is extremely first.(but you have option to write redis inside of disk as well)
 
