@@ -79,3 +79,59 @@ const userSchema = new mongoose.Schema({
 		maxlength: 12
 	}
 })
+
+
+
+/*----/*----What are hooks in Mongoose ----*/----*/
+//Hooks Type ---> 1. pre hooks 2. post hooks
+
+//Example of pre hook :
+            // so we have a password and confirm password and after that we can save user data so before save data we need to check password and confirm password
+	    Schema.pre('name',()=>{});
+//Example of post: 
+             Schema.pre('name',()=>{});
+
+
+/*----/*----populate in mongodb----*/----*/
+//It is kinda Joint with Foreign key concept in normal SQL
+
+----------------------------------          ------------------------------------
+|         Student Schema         |          |            Course Detail         |
+----------------------------------          ------------------------------------
+|  Name      |      Rounak       |          |   ID           |    1            |
+|---------------------------------          ------------------------------------
+|  Age       |      22           |          |   Name         |    Mongo DB     |
+|---------------------------------          ------------------------------------
+|  Course    |     1             |          |  Hours         |     40 Min      |
+|---------------------------------          ------------------------------------
+
+Looks as Data : 
+   {
+     objectID : "dfbebf455",
+     name : "Rounak",
+     age : 22,
+     course : {
+               objectID : "ddjbfbe64645",
+	       name : "MongoDB",
+	       Hours: "40 Min"
+         }
+   }
+   
+Look in Code :
+     //1. Create model First
+     
+      const Student= new mongoose.Schema({
+                 name: {type: string}.
+		 age: {type: number},
+		 course: {
+		     type: mongoose.Schema.Types.objectID,
+		     ref: "couse" // course model name
+		 }
+      });
+      
+      //2. Make APIs
+        student.create({
+	  course : req.body.courseID,
+	  
+	});
+
