@@ -123,10 +123,11 @@ Look in Code :
       const Student= new mongoose.Schema({
                  name: {type: string}.
 		 age: {type: number},
-		 course: {
-		     type: mongoose.Schema.Types.objectID,
+		 course: { // we use populate to get all data of course of that ID
+		     type: mongoose.Schema.Types.objectID, // alternate way(mongoose.SchemaTypes.objectId)
 		     ref: "couse" // course model name
-		 }
+		 },
+                 marks: (v)=> {v%2===0} ; // valudation function
       });
       
       //2. Make APIs
