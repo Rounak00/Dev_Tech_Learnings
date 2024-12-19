@@ -136,3 +136,87 @@ Look in Code :
 	  
 	});
 
+Inner Populate 
+
+Scenario Explanation
+Project Schema references the User model.
+
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const ProjectSchema = new Schema({
+  name: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // Reference to User
+  status: { type: mongoose.Schema.Types.ObjectId, ref: "Status" } // Reference to Status
+});
+const Project = mongoose.model("Project", ProjectSchema);
+Status Schema references the User model.
+
+
+const StatusSchema = new Schema({
+  state: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" } // Reference to User
+});
+const Status = mongoose.model("Status", StatusSchema);
+User Schema is standalone (no references here).
+
+
+const UserSchema = new Schema({
+  name: String,
+  email: String,
+});
+const User = mongoose.model("User", UserSchema);
+
+Querying and Populating
+To populate user and status data from a Project instance, use populate as follows:
+
+Example Query:
+javascript
+Copy code
+const getProjectWithDetails = async (projectId) => {
+  try {
+    const project = await Project.findById(projectId)
+      .populate("user") // Populates user data in the project
+      .populate({
+        path: "status", // Populates status data
+        populate: {
+          path: "user", // Populates user data inside the status
+          model: "User",
+        },
+      });
+    return project;
+  } catch (error) {
+    console.error("Error fetching project details:", error);
+    throw error;
+  }
+};
+
+Explanation of .populate Chain:
+.populate("user"):
+Fetches the user data directly linked to the project collection.
+.populate({ path: "status", populate: { path: "user" } }):
+
+Fetches the status data linked to the project collection.
+Then, fetches the user data referenced within the status document.
+Example Output:
+For a project with this structure:
+
+
+{
+  "_id": "projectId",
+  "name": "Project A",
+  "user": {
+    "_id": "userId1",
+    "name": "John Doe",
+    "email": "john@example.com"
+  },
+  "status": {
+    "_id": "statusId1",
+    "state": "In Progress",
+    "user": {
+      "_id": "userId2",
+      "name": "Jane Smith",
+      "email": "jane@example.com"
+    }
+  }
+}
+
