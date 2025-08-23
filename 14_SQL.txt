@@ -1,0 +1,46 @@
+| emp\_id | emp\_name | dept    | salary | hire\_date | city      | age |
+| ------- | --------- | ------- | ------ | ---------- | --------- | --- |
+| 1       | Ramesh    | HR      | 50000  | 2020-01-15 | Mumbai    | 28  |
+| 2       | Priya     | IT      | 75000  | 2019-06-01 | Delhi     | 32  |
+| 3       | Ankit     | Finance | 60000  | 2021-03-20 | Bangalore | 26  |
+| 4       | Sunita    | IT      | 90000  | 2018-09-12 | Delhi     | 35  |
+| 5       | Karan     | HR      | 45000  | 2022-11-01 | Kolkata   | 24  |
+| 6       | Meena     | Sales   | 55000  | 2017-07-23 | Mumbai    | 40  |
+| 7       | Arjun     | Finance | 80000  | 2021-01-10 | Bangalore | 30  |
+| 8       | Neha      | Sales   | 70000  | 2019-12-05 | Chennai   | 29  |
+| 9       | Vikram    | IT      | 95000  | 2016-04-18 | Hyderabad | 45  |
+| 10      | Shreya    | HR      | 48000  | 2023-02-14 | Mumbai    | 23  |
+
+** Where related questions => 
+1. Returns all employees from IT department. - SELECT * FROM Employees WHERE dept = 'IT';
+2.  All employees except HR. - SELECT * FROM Employees WHERE dept <> 'HR'; (can use !=)
+3. Employees earning more than 70k. - SELECT * FROM Employees WHERE salary > 70000;
+4. Employees with salary between 50k–80k (inclusive). - SELECT * FROM Employees WHERE salary BETWEEN 50000 AND 80000;
+5. Employees whose name starts with “S”. - SELECT * FROM Employees WHERE emp_name LIKE 'S%'; (single char "_")
+6. Employees from Delhi or Mumbai. - SELECT * FROM Employees WHERE city IN ('Delhi', 'Mumbai');
+7. Employees where city is not provided. - SELECT * FROM Employees WHERE city IS NULL; 
+8. IT employees earning more than 80k. - SELECT * FROM Employees WHERE dept = 'IT' AND salary > 80000;
+9. Employees from HR or Finance. - SELECT * FROM Employees WHERE dept = 'HR' OR dept = 'Finance';
+10. IT or Finance employees earning more than 70k. - SELECT * FROM Employees WHERE (dept = 'IT' OR dept = 'Finance') AND salary > 70000;
+11. All employees except Sales. - SELECT * FROM Employees WHERE NOT dept = 'Sales';
+12. Find all unique departments - SELECT DISTINCT dept FROM Employees;
+13. Sort employees by salary (lowest → highest) - SELECT emp_name, salary FROM Employees ORDER BY salary ASC;
+14. Sort employees by age (oldest first) - SELECT emp_name, age FROM Employees ORDER BY age DESC;
+15. Get 2nd and 3rd highest-paid employees - SELECT emp_name, salary FROM Employees ORDER BY salary DESC LIMIT 2 OFFSET 1; 
+
+** Group BY HAving related questions ->  max,min,count,sum,avg function
+1. Count employees in each department - SELECT dept, COUNT(*) AS total_employees FROM Employees GROUP BY dept;
+2. Average salary per department - SELECT dept, AVG(salary) AS avg_salary FROM Employees GROUP BY dept;
+3. Maximum salary per department - SELECT dept, MAX(salary) AS max_salary FROM Employees GROUP BY dept;
+4. Departments with more than 2 employees - SELECT dept, COUNT(*) AS total_employees FROM Employees GROUP BY dept HAVING COUNT(*) > 2;
+5.  Cities with more than 1 employee and average age < 35 - SELECT city, COUNT(*) AS total, AVG(age) AS avg_age FROM Employees GROUP BY city HAVING COUNT(*) > 1 AND AVG(age) < 35;
+6. Top departments by total salary, only if total salary > 150000: - SELECT dept, SUM(salary) AS total_salary FROM Employees GROUP BY dept HAVING SUM(salary) > 150000 ORDER BY total_salary DESC;
+7. Find all departments (from employees hired after 2018) where the average salary is greater than 60,000. Show department name and average salary. - SELECT dept, AVG(salary) AS avg_salary FROM Employees WHERE hire_date > '2018-01-01' GROUP BY dept HAVING AVG(salary) > 60000;
+
+
+** Joins -> Left join, inner join and self join
+** Subquery -> Normal on clauses, corelated Subquery
+
+
+
+
