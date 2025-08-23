@@ -39,8 +39,152 @@
 
 
 ** Joins -> Left join, inner join and self join
+
+1. Self join -> 
+| emp\_id | emp\_name | manager\_id |     Show each employee with their manager’s name.
+| ------- | --------- | ----------- |
+| 1       | Ramesh    | NULL        |     SELECT e.emp_name AS Employee, m.emp_name AS Manager
+| 2       | Priya     | 1           |     From Employees e
+| 3       | Ankit     | 1           |     Left join Employees m
+| 4       | Sunita    | 2           |     on e.manager_id=m.emp_id;
+| 5       | Karan     | 2           |
+
+2. Joins -> 
+emp
+| eid | ename  | did |
+| --- | ------ | --- |
+| 1   | Ram    | 10  |
+| 2   | Priya  | 20  |
+| 3   | Ankit  | 10  |
+| 4   | Sunita | 30  |
+| 5   | Karan  | 20  |
+dept 
+| did | dname   |
+| --- | ------- |
+| 10  | HR      |
+| 20  | IT      |
+| 30  | Finance |
+proj
+| pid | pname   | did |
+| --- | ------- | --- |
+| 101 | Apollo  | 10  |
+| 102 | Titan   | 20  |
+| 103 | Mercury | 20  |
+| 104 | Orion   | 30  |
+
+Q1: Show each employee with their department name.
+=> 
+SELECT e.ename, d.dname
+FROM emp e
+Inner JOIN dept d ON e.did = d.did;
+
+Q2 (LEFT JOIN): Show all departments with employees (include departments even if no employees).
+=> 
+SELECT d.dname, e.ename
+FROM dept d
+LEFT JOIN emp e ON d.did = e.did;
+     
+Q3: Show employees with their department and project.
+=>
+SELECT e.ename, d.dname, p.pname
+FROM emp e
+JOIN dept d ON e.did = d.did
+JOIN proj p ON d.did = p.did;
+
+Q4 (LEFT JOIN): Show all employees and their projects (even if dept has no project).
+=>
+SELECT e.ename, d.dname, p.pname
+FROM emp e
+JOIN dept d ON e.did = d.did
+LEFT JOIN proj p ON d.did = p.did;
+
+Q5: Count number of employees in each department.
+=>
+SELECT d.dname, COUNT(e.eid) AS total_emp
+FROM dept d
+LEFT JOIN emp e ON d.did = e.did
+GROUP BY d.dname;
+
+Q8: Find employees and their projects, but only for IT department.
+=>
+SELECT e.ename, d.dname, p.pname
+FROM emp e
+JOIN dept d ON e.did = d.did
+JOIN proj p ON d.did = p.did
+WHERE d.dname = 'IT';
+
+Q9: Find departments with more than 1 employee, but only consider departments where at least 1 project exists.
+=>
+SELECT d.dname, COUNT(e.eid) AS total_emp
+FROM dept d
+JOIN emp e ON d.did = e.did
+JOIN proj p ON d.did = p.did
+GROUP BY d.dname
+HAVING COUNT(e.eid) > 1;
+
+
+
+
+
 ** Subquery -> Normal on clauses, corelated Subquery
 
+Employees (emp)
+| emp\_id | emp\_name | dept\_id | salary |
+| ------- | --------- | -------- | ------ |
+| 1       | Ramesh    | 1        | 50000  |
+| 2       | Priya     | 2        | 75000  |
+| 3       | Ankit     | 1        | 60000  |
+| 4       | Sunita    | 3        | 90000  |
 
+
+Departments (dept)
+| dept\_id | dept\_name |
+| -------- | ---------- |
+| 1        | HR         |
+| 2        | IT         |
+| 3        | Finance    |
+
+1. Where -> Find employees who earn more than the average salary of all employees.
+SELECT emp_name, salary FROM emp
+WHERE salary > (SELECT AVG(salary) FROM emp);
+
+2. From -> Find the average salary per department, then list only departments having average salary > 60000.
+
+SELECT d.dept_name, t.avg_salary
+FROM (
+    SELECT dept_id, AVG(salary) AS avg_salary
+    FROM emp
+    GROUP BY dept_id
+) AS t
+JOIN dept d ON t.dept_id = d.dept_id WHERE t.avg_salary > 60000;
+
+3. Select -> Show each employee with their salary and also display the highest salary in the company as a new column.
+SELECT emp_name, salary, (SELECT MAX(salary) FROM emp) AS highest_salary FROM emp;
+
+4. Corelated subquery -> Find employees who earn more than the average salary of their own department.
+SELECT e.emp_name, e.salary, e.dept_id
+FROM emp e WHERE e.salary > (
+    SELECT AVG(e2.salary)
+    FROM emp e2
+    WHERE e2.dept_id = e.dept_id
+);
+
+5. Exist and Not Exist use in corelted subquery and that time we return 1 from inner query 
+a > Find all departments that have at least one employee.
+    SELECT d.dept_name
+    FROM dept d
+    WHERE EXISTS (
+        SELECT 1
+        FROM emp e
+        WHERE e.dept_id = d.dept_id
+    );
+b > Find all departments that do NOT have any employees.
+    SELECT d.dept_name
+    FROM dept d
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM emp e
+        WHERE e.dept_id = d.dept_id
+    );
 
 
