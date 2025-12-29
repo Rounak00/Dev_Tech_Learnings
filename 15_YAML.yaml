@@ -1,0 +1,100 @@
+# YAML is indentation-based
+# Use SPACES (never tabs)
+# Usually 2 spaces per level
+# key value paried
+
+# Key – Value
+name: Rounak #can give court in string
+age: 24
+active: true #boolean can be true/false, on/off, yes/no
+# Strings example
+# use court for special characters and special characteradd like this -> "some thing value \n"
+title: Hello World
+title2: "Hello World"
+title3: 'Hello World'
+
+# Multiline string
+description: |
+  This is line one
+  This is line two
+
+# Folded string (joins lines)
+description: >
+  This will be
+  in one line
+
+# Arrays (Lists)
+ports:
+  - 3000
+  - 4000
+  - 5000
+#  or
+ports: [3000, 4000, 5000]
+
+
+# Objects (Maps)
+database:
+  host: localhost
+  port: 5432
+
+
+# Array of Objects 
+users:
+  - name: Rounak
+    role: backend
+
+  - name: Ankit
+    role: frontend
+
+# Nested Structures
+services:
+  backend:
+    image: node
+    ports:
+      - 3000
+    env:
+      NODE_ENV: production
+
+
+# Null / Empty Values
+value: null
+value2: ~
+empty_string: ""
+
+
+# Environment Variables Style (for access env variables we use $ as prefix like -> $DB_URL)
+env:
+  - name: DB_HOST
+    value: localhost
+  - name: DB_PORT
+    value: "5432"
+
+
+# Component divided by (---)
+---
+apiVersion: v1
+kind: ConfigMap
+---
+apiVersion: apps/v1
+kind: Deployment
+
+
+
+
+# -> Docker compose example 
+version: "3.9"
+services:
+  app:
+    image: node:18
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: secret
+
+
+
