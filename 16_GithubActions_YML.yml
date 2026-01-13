@@ -3,6 +3,7 @@
 # in steps is shell program then no need to use ${{...variable...}}, like in if conditions
 # artifacts for creted in one job that can use in another job
 # cache -> in a single workflow for each push/worflow, so like first push cache created and in 2nd or 3rd the cache used
+# secrets can be written in github repo settings -> Like docker credentials for uploda image in docker hub
 name: Node.js CI/CD
 
 on:
