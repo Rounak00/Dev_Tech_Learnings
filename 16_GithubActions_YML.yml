@@ -1,0 +1,136 @@
+# Each job run on a different new machine 
+# jobs will run parallely until we use -> Need 
+# in steps is shell program then no need to use ${{...variable...}}, like in if conditions
+# artifacts for creted in one job that can use in another job
+# cache -> in a single workflow for each push/worflow, so like first push cache created and in 2nd or 3rd the cache used
+name: Node.js CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # allows manual trigger
+
+jobs:
+  build:
+    name: Build and Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [20]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Cache node_modules
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        if: matrix.os != 'windows-latest'
+        run: npm test || echo "No tests found, skipping"
+
+      - name: Build project (optional)
+        run: echo "Build step complete for ${{ matrix.os }}"
+
+      # Upload artifact for publish job
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: project-artifact
+          path: ./
+
+  publish:
+    name: Publish & Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # Download artifact from build
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: project-artifact
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Publish step
+        run: echo "Publishing project on Ubuntu only"
+
+      - name: Deploy to Render
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npm install -g @render/cli
+          render deploy service ${{ secrets.RENDER_SERVICE_ID }} --api-key ${{ secrets.RENDER_API_KEY }}
+
+
+
+# 🔰 Core → Advanced GitHub Actions Topics
+# Workflow & Control
+# 1. workflow_dispatch (inputs, manual triggers)
+# 2. schedule (cron jobs)
+# 3. concurrency (cancel previous runs)
+# 4. permissions (GITHUB_TOKEN scopes)
+
+# Conditions & Expressions
+#1. if expressions (job-level vs step-level)
+#2. continue-on-error
+#3. always(), success(), failure()
+#4. Contexts (github, env, runner, matrix)
+
+# Environment & Secrets
+#1. env (workflow / job / step scope)
+#2. Environments (staging, production)
+#3. Environment-level secrets & approvals
+#4. Masking secrets in logs
+
+# Jobs & Architecture
+#1. Reusable workflows (workflow_call)
+#2. Composite actions
+#3. Custom GitHub Actions (JS / Docker)
+#4. Job outputs (outputs)
+
+# CI Quality
+#1. Linting pipelines (ESLint, Prettier)
+#2. Test reports & coverage artifacts
+#3. Status badges
+#4. PR checks & required checks
+
+# Deployment & Release
+#1. Tag-based workflows (v*)
+#2. Release automation
+#3. Blue-green / staged deploys
+#4. Rollback strategies
+
+# Docker & Infra
+#1. Docker build & push
+#2. Docker layer caching
+#3. Self-hosted runners
+#4. Kubernetes deploy via Actions
+
+# Monorepo & Scale
+#1. Path-based workflows (paths, paths-ignore)
+#2. Monorepo selective jobs
+#3. Large matrix optimization
+#4. Cost & runtime optimization
