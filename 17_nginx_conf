@@ -1,0 +1,98 @@
+worker_processes 1; //number of worker processes (default is number of CPU cores) can set as auto as well
+events {
+    worker_connections 1024; //how many connections can be handled simultaneously(default 512)
+}
+
+http {
+    include mime.types;
+
+#   For cahche
+#   proxy_cache_path /var/cache/nginx
+#                  levels=1:2
+#                  keys_zone=my_cache:10m
+#                  max_size=1g
+#                  inactive=60m
+#                  use_temp_path=off;
+
+
+
+  # for nextflix style compression
+  # --------------------
+  # GZIP COMPRESSION
+  # --------------------
+#   gzip on;
+#   gzip_min_length 256;
+#   gzip_comp_level 6;
+#   gzip_types
+#     text/plain
+#     text/css
+#     application/json
+#     application/javascript
+#     text/xml
+#     application/xml
+#     application/xml+rss
+#     text/javascript;
+#   gzip_proxied any;
+#   gzip_vary on; 
+
+  upstream backend_servers {
+    least_conn; //Algorithm to distribute requests (default round robin)
+    server localhost:3001;
+    server localhost:3002;
+    server localhost:3003;
+  }
+
+  server {
+    # listen 8080; for local host
+    listen 443 ssl; //listen on port 443 for SSL/TLS
+    server_name localhost; //change to your domain name in production
+    ssl_certificate     /etc/nginx/ssl/nginx.crt; //path to your SSL certificate
+    ssl_certificate_key /etc/nginx/ssl/nginx.key; //path to your SSL certificate key
+
+    location / {
+      # If used cache 
+    #   proxy_cache my_cache;
+    #   proxy_cache_valid 200 10m;
+    #   proxy_cache_methods GET;
+    #   proxy_cache_key "$scheme$request_method$host$request_uri";
+
+      proxy_pass http://backend_servers;
+      proxy_set_header Host $host; //forward the original host header
+      proxy_set_header X-Real-IP $remote_addr; //forward the client IP address
+
+    #   While use cahche -> add_header X-Cache-Status $upstream_cache_status;
+    }
+  }
+
+  server {  
+    # if request in http then redires to https but normally nginx also do it automatically but good practice is to do it by own
+    listen 80; //listen on port 80 for HTTP
+    server_name localhost; //change to your domain name in production
+    return 301 https://$host$request_uri; //redirect all HTTP requests to HTTPS
+  }
+}
+
+# Commands:
+# nginx  -> to start the nginx server
+# nginx -s reload  -> to reload the nginx after changes in config file
+# nginx -s stop  -> to stop the nginx server
+# nginx -t  -> to test the config file for syntax errors
+# nginx -h -> to see the help options
+
+
+# What all works we can perform with nginx:
+# Reverse Proxy
+# Load Balancing
+# SSL / TLS Termination
+# HTTP → HTTPS Redirection
+# Response Caching
+# Compression (Gzip / Brotli)
+# Static File Serving
+# URL Rewriting & Redirects
+# Rate Limiting & Throttling
+# IP Whitelisting / Blacklisting
+# Security Headers & Hardening, CORS Handling
+# WebSocket Proxying
+# Custom logging, Request Timeouts, Retries & Failover
+# A/B Testing & Canary Releases, 
+# API Gateway & Microservices Routing
