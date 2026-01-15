@@ -1,0 +1,166 @@
+# =========================================
+# Dockerfile Cheat Sheet (Complete – SDE-1)
+# =========================================
+
+
+# ---------- BASE IMAGE ----------
+# FROM sets the base image for your application
+# Everything runs on top of this image
+FROM node:20-alpine
+
+
+# ---------- BUILD ARGUMENT ----------
+# ARG is used at BUILD TIME only
+# Can be passed using: docker build --build-arg NODE_ENV=dev .
+ARG NODE_ENV=production
+
+
+# ---------- ENVIRONMENT VARIABLES ----------
+# ENV is available at RUNTIME inside container
+ENV NODE_ENV=${NODE_ENV}
+ENV PORT=3000
+
+
+# ---------- WORKING DIRECTORY ----------
+# Sets the working directory inside container
+# If not exists, Docker creates it
+# All COPY, RUN, CMD work relative to this
+WORKDIR /app
+
+
+# ---------- COPY (Dependency Files First) ----------
+# Copy only dependency files
+# Helps Docker layer caching
+COPY package.json package-lock.json ./
+
+
+# ---------- RUN (Build-time command) ----------
+# Executes during image build
+# Each RUN creates a new image layer
+RUN npm install
+
+
+# ---------- COPY (Application Code) ----------
+# Copies entire project from build context
+# First '.' → host build context
+# Second '.' → WORKDIR (/app)
+COPY . .
+
+
+# ---------- USER (Security Best Practice) ----------
+# Avoid running app as root (optional for SDE-1)
+# RUN addgroup -S app && adduser -S app -G app
+# USER app
+
+
+# ---------- EXPOSE ----------
+# Documents the port the app listens on
+# Does NOT actually open the port
+EXPOSE 3000
+
+
+# ---------- HEALTHCHECK ----------
+# Lets Docker know how to check if app is healthy
+# Optional but good to know
+HEALTHCHECK --interval=30s --timeout=5s \
+  CMD curl -f http://localhost:3000/ || exit 1
+
+
+# ---------- ENTRYPOINT ----------
+# Defines the main executable
+# Usually fixed and not overridden
+# ENTRYPOINT ["node"]
+
+
+# ---------- CMD ----------
+# Default command when container starts
+# Can be overridden at runtime
+CMD ["npm", "start"]
+
+
+# =========================================
+# KEY CONCEPT NOTES (Interview Gold)
+# =========================================
+# RUN        → build time
+# CMD        → runtime
+# ENTRYPOINT → fixed executable
+# ARG        → build time only
+# ENV        → runtime environment
+# COPY       → host → container
+# WORKDIR   → current directory inside container
+# EXPOSE    → documentation only
+# =========================================
+
+
+
+# --------------------------------------------Mulristage build-------------------------------------------------------------
+    # =========================================
+# MULTI-STAGE DOCKERFILE (Node.js Example)
+# =========================================
+
+
+# ---------- STAGE 1: BUILD STAGE ----------
+# This stage is used ONLY to build the app
+# It can be large and heavy (dev dependencies allowed)
+
+FROM node:20 AS builder
+# AS builder → names this stage "builder"
+
+# Set working directory inside container
+WORKDIR /app
+
+# Copy dependency files first for caching
+COPY package.json package-lock.json ./
+
+# Install ALL dependencies (including dev)
+RUN npm install
+
+# Copy application source code
+COPY . .
+
+# Build the application (e.g. React / TS / Next build)
+RUN npm run build
+
+
+# ---------- STAGE 2: PRODUCTION STAGE ----------
+# This stage is the FINAL image
+# Should be small, secure, production-ready
+
+FROM node:20-alpine
+# Smaller base image for production
+
+# Set working directory
+WORKDIR /app
+
+# Copy only the built output from builder stage
+# --from=builder → copy files from stage 1
+COPY --from=builder /app/dist ./dist
+
+# Copy only required files
+COPY package.json package-lock.json ./
+
+# Install ONLY production dependencies
+RUN npm install --production
+
+# Expose application port
+EXPOSE 3000
+
+# Start the app
+CMD ["node", "dist/index.js"]
+
+
+# =========================================
+# WHY MULTI-STAGE?
+# - Build tools stay in builder image
+# - Final image is smaller & secure
+# - Faster deployments
+# =========================================
+
+
+
+
+
+
+# Advices
+# 1. dockerignore file is also there that docker cant see
+# 2. volume mostly good to use in compose file
