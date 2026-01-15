@@ -156,6 +156,8 @@ CMD ["node", "dist/index.js"]
 # - Faster deployments
 # =========================================
 
+# Why we need Multi-Stage Docker builds (exactly) Core idea (1 line 🔥)
+# Multi-stage builds separate build-time work from runtime needs, so the final image contains only what is required to run the app.
 
 
 
