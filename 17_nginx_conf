@@ -5,6 +5,8 @@ events {
 
 http {
     include mime.types;
+#   Ratelimiting
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
 
 #   For cahche
 #   proxy_cache_path /var/cache/nginx
@@ -56,6 +58,8 @@ http {
     #   proxy_cache_methods GET;
     #   proxy_cache_key "$scheme$request_method$host$request_uri";
 
+    # Ratelimting
+      limit_req zone=api_limit burst=20 nodelay;
       proxy_pass http://backend_servers;
       proxy_set_header Host $host; //forward the original host header
       proxy_set_header X-Real-IP $remote_addr; //forward the client IP address
@@ -82,7 +86,7 @@ http {
 
 # What all works we can perform with nginx:
 # Reverse Proxy
-# Load Balancing
+# Load Balancing & Ratelimiting
 # SSL / TLS Termination
 # HTTP → HTTPS Redirection
 # Response Caching
@@ -95,4 +99,5 @@ http {
 # WebSocket Proxying
 # Custom logging, Request Timeouts, Retries & Failover
 # A/B Testing & Canary Releases, 
+
 # API Gateway & Microservices Routing
