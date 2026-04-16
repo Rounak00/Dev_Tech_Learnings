@@ -118,6 +118,28 @@ IT is single theaded.
                  }
                 boot();
 
+----------------------------------Cache Handling strategy-------------------------------------------
+    1. Cache-Aside (Lazy Loading) -> 
+            App checks cache first
+            If miss → fetch from DB → store in cache
+            If hit → return cache
+
+    2. TTL -> Every cache entry expires automatically after a time.
+    3. Write-Through -> 
+          Write happens to cache AND DB at same time
+          Cache is always up-to-date
+    4. Write-Back (Write-Behind) — advanced
+            Write to cache first
+            DB updated later (async)
+    5. Cache Invalidation -> When DB changes → cache must be updated or removed
+    6. Read-Through (less common in Node apps) -> 
+            Cache layer itself fetches from DB
+            App doesn’t handle cache logic
+            Usually done via middleware / libraries (not manual Redis usage)
+   7. Refresh-Ahead (pro optimization) -> Before cache expires → refresh it in background, Avoid cache miss spikes
+   8. Cache Stampede Protection (VERY important) -> Multiple requests hit DB when cache expires
+   9. Distributed Cache (architecture level) -> Redis shared across services, Used in microservices
+
 -------------------------------------------All Works taht can be accomblish by REDIS----------
 🚀 1. Caching (most common)
 Use cases
