@@ -1,0 +1,87 @@
+Server
+_______
+
+// server.js
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const PORT = 4000;
+
+app.use(cors());
+
+app.get('/api/messages', async (req, res) => {
+  // Simulate long delay (e.g., wait for new message)
+  // you can also check what was the last data, if not same only send data
+  setTimeout(() => {
+    const message = {
+      timestamp: new Date().toISOString(),
+      text: 'New message from server!',
+    };
+    res.json(message);
+  }, 3000); // Simulate 3 second wait (can be dynamic in real apps)
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listening at http://localhost:${PORT}`);
+});
+
+
+Client
+______
+
+// LongPollingComponent.jsx
+import React, { useEffect, useState } from 'react';
+
+const LongPollingComponent = () => {
+  const [messages, setMessages] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const poll = async () => {
+      try {
+        const res = await fetch('http://localhost:4000/api/messages');
+        if (!res.ok) throw new Error('Server error');
+        const data = await res.json();
+
+        if (!isCancelled) {
+          setMessages((prev) => [data, ...prev]); // Prepend new message
+          setError(null);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          setError(err.message);
+        }
+      }
+
+      // Continue polling
+      if (!isCancelled) {
+        poll();
+      }
+    };
+
+    poll();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  return (
+    <div>
+      <h2>React Long Polling (with Express Backend)</h2>
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+      <ul>
+        {messages.map((msg, index) => (
+          <li key={index}>
+            <strong>{msg.timestamp}:</strong> {msg.text}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default LongPollingComponent;

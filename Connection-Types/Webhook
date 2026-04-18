@@ -1,0 +1,59 @@
+//backend 
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+const PORT = 5000;
+
+// Parse incoming JSON payloads
+app.use(bodyParser.json());
+
+// Webhook endpoint
+app.post('/webhook', (req, res) => {
+  console.log('Webhook received:', req.body);
+
+  // Respond quickly to the webhook sender
+  res.status(200).send('Webhook received');
+});
+
+app.listen(PORT, () => {
+  console.log(`Webhook server running at http://localhost:${PORT}`);
+});
+
+
+
+//frontend 
+import React from 'react';
+
+function App() {
+  const sendWebhook = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event: 'user_signup',
+          user: {
+            id: 123,
+            name: 'Rounak',
+          },
+        }),
+      });
+
+      const result = await response.text();
+      alert(`Server response: ${result}`);
+    } catch (err) {
+      console.error('Error sending webhook:', err);
+    }
+  };
+
+  return (
+    <div style={{ padding: '2rem' }}>
+      <h2>Send Webhook</h2>
+      <button onClick={sendWebhook}>Trigger Webhook</button>
+    </div>
+  );
+}
+
+export default App;
