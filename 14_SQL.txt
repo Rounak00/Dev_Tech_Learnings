@@ -188,3 +188,38 @@ b > Find all departments that do NOT have any employees.
     );
 
 
+
+___________________________________________________________________________________________________
+*) How SQL actually run internally ?
+=> 
+SELECT u.name, COUNT(o.id)
+FROM users u
+JOIN orders o ON u.id = o.user_id
+WHERE u.age > 18
+GROUP BY u.name
+HAVING COUNT(o.id) > 5
+ORDER BY COUNT(o.id) DESC
+LIMIT 10;
+
+1. FROM
+2. JOIN
+3. ON
+4. WHERE
+5. GROUP BY
+6. HAVING
+7. SELECT
+8. ORDER BY
+9. LIMIT
+
+*) Now why this actully matters ?
+A developer should know SQL execution order because otherwise:
+queries become slow
+bugs happen
+aggregations break
+indexes are misused
+pagination becomes inefficient
+joins explode memory/CPU
+
+1> SELECT department, COUNT(*) FROM employees GROUP BY department HAVING salary > 50000;
+2> SELECT department, COUNT(*) FROM employees WHERE salary > 50000 GROUP BY department;
+now 2 is faster than 1.
