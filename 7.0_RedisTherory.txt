@@ -1,0 +1,130 @@
+See, Redis have a lot of theroy and not possible to note down everything but try to store most used once.
+> Redis is a in-memory fast DB thing, but also take the network latency time.
+
+ALL DS in Redis
+| Feature         | DS      |
+| --------------- | ------- |
+| Cache           | STRING  |
+| User Profile    | HASH    |
+| Queue           | LIST    |
+| Leaderboard     | ZSET    |
+| Online Users    | SET     |
+| Event System    | STREAM  |
+| Live Chat       | PUB/SUB |
+| Nearby Drivers  | GEO     |
+| Unique Visitors | HLL     |
+| Attendance      | BITMAP  |
+
+1. STRING
+    Best for: Caching, Counters, OTP, Session token, Feature flags, Simple key-value storage
+    Commands: ->
+    
+      SET user:1 "Rounak"
+      GET user:1
+      SETEX otp:9999 60 "1234"     # auto expire
+      INCR page_views
+      DECR stock_count
+      APPEND msg "hello"
+      MGET k1 k2 k3
+      DEL key
+      EXPIRE token 300
+      TTL token
+
+2. HASH  
+    Best for: Store object-like data
+    Commands: ->
+    HSET user:1 name "Rounak" age 25 city "Kolkata"
+    HGET user:1 name
+    HGETALL user:1
+    HMGET user:1 name age
+    HDEL user:1 age
+    HEXISTS user:1 name
+    HINCRBY user:1 points 10
+
+3. LIST 
+    Best for: Queue / ordered items
+    Command: ->
+      LPUSH jobs "send_mail"
+      RPUSH jobs "generate_pdf"
+      LPOP jobs
+      RPOP jobs
+      LRANGE jobs 0 -1
+      LLEN jobs
+
+4. SET
+    Best For : Unique values
+    Commands: ->
+      SADD online_users 1
+      SADD online_users 2
+      SMEMBERS online_users
+      SISMEMBER online_users 1
+      SREM online_users 1
+      SCARD online_users
+
+5. SORTED SET / ZSET
+      Best for: Ranking + score-based systems
+      Commands : -> 
+        ZADD leaderboard 100 "Rounak"
+        ZADD leaderboard 250 "Alex"
+        ZRANGE leaderboard 0 -1
+        ZREVRANGE leaderboard 0 -1
+        ZRANK leaderboard "Rounak"
+        ZREVRANK leaderboard "Rounak"
+        ZSCORE leaderboard "Rounak"
+        ZINCRBY leaderboard 50 "Rounak"
+
+
+6. STREAM 
+    Best for: Event-driven systems / Kafka-like messaging
+    Commands: -> 
+      XADD orders * user 1 product laptop
+      XREAD STREAMS orders 0
+      XRANGE orders - +
+      XGROUP CREATE orders workers 0
+      XREADGROUP GROUP workers c1 STREAMS orders >
+
+
+7. PUB/SUB
+     Best for: Real-time messaging
+     Command: -> 
+       SUBSCRIBE chat
+       PUBLISH chat "hello"
+
+8. BITMAP
+    Best for: Boolean tracking at huge scale
+    Commands : -> 
+      SETBIT online 1001 1
+      GETBIT online 1001
+      BITCOUNT online
+
+9. HYPERLOGLOG
+   Best for: Approx unique count
+   Commands : ->
+     PFADD visitors user1 user2
+     PFCOUNT visitors
+
+10. GEO
+     Best for: Location systems
+     Commands : -> 
+        GEOADD drivers 88.3639 22.5726 "driver1" 
+        GEORADIUS drivers 88.3639 22.5726 5 km
+        GEOPOS drivers driver1
+
+------------------------------------Some EXTRA -------------------------------
+-Expiry Commands-
+EXPIRE key 60
+TTL key
+PERSIST key
+SETEX otp 60 "1234"
+
+
+-Transactions-
+MULTI
+SET a 10
+INCR a
+EXEC
+
+
+> Redis only guarantees:
+commands execute sequentially without interruption
+NOT: rollback, isolation like SQL, partial undo
