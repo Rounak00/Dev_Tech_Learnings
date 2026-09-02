@@ -15,34 +15,7 @@ Isolation — technically applies to every implicit or explicit transaction; you
 Durability — applies once any write is committed/acknowledged, transaction or not (subject to write concern in Mongo, fsync/WAL settings in Postgres).
 
 -------------------------------------------------------------------------Transaction normal code in mongodb ------------------------------------------------
-const session = await mongoose.startSession();
 
-try {
-    await session.withTransaction(async () => {
-
-        const user = await User.findById(userId).session(session);
-
-        user.balance -= 100;
-        await user.save({ session });
-
-        const wallet = new Wallet({
-            userId,
-            amount: 100
-        });
-
-        await wallet.save({ session });
-    });
-
-    res.json({ success: true });
-
-} catch (error) {
-    res.status(500).json({
-        success: false,
-        message: error.message
-    });
-} finally {
-    await session.endSession();
-}
 
 
 ------------------------------------------------------------------
