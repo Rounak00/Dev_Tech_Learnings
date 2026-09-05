@@ -14,8 +14,57 @@ Consistency — mostly enforced by schema constraints, unique indexes, foreign k
 Isolation — technically applies to every implicit or explicit transaction; you just don't notice it with single statements because there's nothing concurrent to isolate from within that one operation. It becomes visibly important with concurrent multi-statement transactions, controlled via isolation levels (read committed, repeatable read, serializable, etc.).
 Durability — applies once any write is committed/acknowledged, transaction or not (subject to write concern in Mongo, fsync/WAL settings in Postgres).
 
--------------------------------------------------------------------------Transaction normal code in mongodb ------------------------------------------------
+-------------------------------------------------------------------------Transaction normal code in mongoose ------------------------------------------------
+Transaction
+
+const session = await mongoose.startSession();
+
+try {
+    await session.withTransaction(async () => {
+
+        const user = await User.findById(userId).session(session);
+
+        user.balance -= 100;
+        await user.save({ session });
+
+        const wallet = new Wallet({
+            userId,
+            amount: 100
+        });
+
+        await wallet.save({ session });
+    });
+
+    res.json({ success: true });
+
+} catch (error) {
+    res.status(500).json({
+        success: false,
+        message: error.message
+    });
+} finally {
+    await session.endSession();
+}
 
 
 
-------------------------------------------------------------------
+-------------------------------------------------Same in Postgressql---------------------------------------------------
+// Express + Drizzle transaction
+app.post("/transfer", async (req, res) => {
+  try {
+    await db.transaction(async (tx) => {
+
+      await tx
+        .update(accounts)
+        .set({ balance: sql`${accounts.balance} - 100` })
+        .where(eq(accounts.id, 1));
+
+      await tx
+        .update(accounts)
+        .set({ balance: sql`${accounts.balance} + 100`})
+        .where(eq(accounts.id, 2));
+    });
+    res.json({ message: "Transfer successful" });
+  } catch (error) { res.status(500).json({ message: "Transaction failed"});}
+});
+
