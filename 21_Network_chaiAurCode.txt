@@ -1274,7 +1274,19 @@ Flow:
 - Repeat certificate verification up the chain until a trusted root CA is reached.
 Other certificate checks:SAN / hostname Validity period Other constraints 
 
-Chain of trust => verify till Rot certificate (self signed of cert), browser and os knows about this certificate
+Chain of trust => verify till Root certificate (self signed of cert), browser and os knows about this certificate
+
+Browser → Server: TLS in simple terms
+1. Browser connects to https://ssw.com 
+2. Server sends its TLS certificate → certificate contains the server's public key.
+3. Browser verifies the certificate:
+Is it for ssw.com?
+Is it valid?
+Is it signed by a trusted CA?
+4. If valid, the browser now trusts the server's public key.
+5. Browser and server perform the TLS handshake and establish a shared session key.
+6. After that, actual HTTP data is encrypted using the session key (symmetric encryption).
+
 
 
 
@@ -1283,7 +1295,7 @@ Chain of trust => verify till Rot certificate (self signed of cert), browser and
 
 video 44 > Maths behind Diffie hellman
 Diffie-Hellman (Whitfield Diffie and Martin Hellman)
-- Key exchange protocolUses publicly known parameters: prime p and generator g
+- Key exchange protocol Uses publicly known parameters: prime p and generator g
 - Based on the Discrete Logarithm Problem
 - ECDHE is the modern elliptic-curve variant widely used in TLS
 - Diffie-Hellman is key exchange algo, not message encryption
