@@ -1,0 +1,1593 @@
+Network Notes
+
+Vid 1 >
+
+Roadmap -> 
+   1. HTTP Call happening
+   2. N/W Fundamental - IP, n/w-hosts, subnet, CIDR, gateway, MAC vs IP, ARP, OSI,TCP IP, routing works, ICMP, Ping and Traceroute
+   3. UDP - practical, anatomy
+   4. TCP - 3 way handshake, MTU MSS, PMTUD, congestiona dn flow control
+
+   5. DNS - Records like A AAA MX CNAME TXT NS SPF PTR
+   6. HTTP and Additional topics -> different versions, TLS, DHCP, NAT, 
+
+
+
+
+Vid 2 > What Really Happens When You Make an HTTP Request?
+
+  localhost -> 127.0.0.1 and have a port
+  
+  Source to Destination call (HTTP based on TCP)
+   1. DNS look up an it return the public IP
+   2. over the network texts go as a bytes
+   3. OS TCP/IP stack -> 
+         a. at first do a 3 way handshake for connection
+         b. break in chunks the whole datat byte (based on MTU and MSS)
+         c. in each chunk attach a src and Detination PORT and each chunks will have a sequence number to maintain order 
+         d. now each chunks encapsulate in ip packet that will have src and dest ips
+         e. another encapsulation happend on it to add src MAC address and NIC MAC address also add a default/fallack mac address
+There is also somthing called ARP (Address Resolution Protocol) 
+take Ip address as an input and return MAC address of the device that holding that IP
+
+see os know destination IP not MAC,it try to send in default gateway usually 192.168.1.1 
+it mostly done to understand who will receive the ethernet frames
+
+
+
+Videos 3> Mastering IP
+
+Internet Protocol
+Local host have a IP address
+structure -> a.b.c.d where abcd are integers and notation called are dotted quad and each part is octed
+
+136.25.36.89 -> decimal representation can also do binary format
+
+8bits peroctate -> 8*4 bits -> 32 bits (PV4)
+
+
+Vid 4 > Master Networking Basics: Network, Host, and CIDR Demystified
+
+connection b/w mobile, laptop, router is a connection which called Network.
+HOST is someone who holds unique ID.
+
+Using DHCP (Dynamic Host Configuration Protocol) Router gives a ID(IP) eac connected devices to it, This is a LAN (Local Area N/w)
+
+CIDR -> 192.168.1.0/X this is the reserved ip for the whole networks now each device get ip like this 192.168.1.1, 192.168.1.2 .... here x can be 0-32 num of bits reserved for the network here first 3 octed are reserved for the n/w and last octed for HOST.
+CIDR range is like this a.b.c.d/X
+so if cidr is /8 -> Network <8 bits> and Host <24 bits>
+
+
+0.0.0.0/0 -> all dynamic nothing is reserved
+
+
+
+
+Vid 5 > How Subnet Masks Reveal Network Secrets
+  
+A subnet is simply a smaller network created from a larger network.
+BIG NETWORK
+192.168.0.0/16
+        │
+        ├── Subnet A
+        │   192.168.1.0/24
+        │
+        ├── Subnet B
+        │   192.168.2.0/24
+        │
+        ├── Subnet C
+        │   192.168.3.0/24
+        │
+        └── Subnet D
+            192.168.4.0/24
+
+Network -> be divided into -> subnets -> which contain -> Hosts/devices
+
+Inside a network a Host can send another host data but if one host is otside then need to send through network/Router
+
+Subnet Masks : 255.255.255.0 Kind of IP to determine whether the destination IP is part of the sender's network or not 
+Will be like senders IP(Binary) and apply the mask IP(Binary)
+and make a another IP now if this IP  my Network IP then get to know thisis my network inside host 
+The OS performs a bitwise AND between the IP address and the subnet mask to calculate the network address.
+
+
+Vid 6 > Understand Default Gateway
+
+Laptop to mobile where mobile is outside of network , so Router is dafult Gateway, now Router decide how to send the datat to the mobile
+when laptop connects to Router it set a dafult gateway for Router
+
+
+
+Vide 7 >  How Default gateway (Router) facilitates
+
+
+
+
+Router can have multiple Ethernet Connection lther end network service provider
+
+
+
+like this
+
+                    SUBNET MASK: 255.255.255.0
+                    NETWORK A: 192.168.1.0/24
+
+        ┌──────────────────────────────────────────────┐
+        │                  NETWORK A                   │
+        │              192.168.1.0/24                 │
+        │                                              │
+        │   Host A1                 Host A2            │
+        │   192.168.1.2             192.168.1.3        │
+        │       │                       │              │
+        │       │                       │              │
+        │       └──────────┐   ┌────────┘              │
+        │                  │   │                       │
+        │               ┌──▼───▼──┐                    │
+        │               │ ROUTER  │                    │
+        │               │         │                    │
+        │               │ Gateway │                    │
+        │               └──┬───┬──┘                    │
+        │                  │   │                       │
+        │       ┌──────────┘   └────────┐              │
+        │       │                       │              │
+        │   Host A3                         │            │
+        │   192.168.1.4                    │            │
+        │                                  │            │
+        └──────────────────────────────────┘           
+
+
+                    ROUTER / DEFAULT GATEWAY
+                    192.168.1.50
+                           │
+                           │
+                           ▼
+
+
+                    SUBNET MASK: 255.255.255.0
+                    NETWORK B: 192.168.2.0/24
+
+        ┌──────────────────────────────────────────────┐
+        │                  NETWORK B                   │
+        │              192.168.2.0/24                 │
+        │                                              │
+        │   Host B1                 Host B2            │
+        │   192.168.2.2             192.168.2.3        │
+        │       │                       │              │
+        │       │                       │              │
+        │       └──────────┐   ┌────────┘              │
+        │                  │   │                       │
+        │                  ▼   ▼                       │
+        │               ROUTER                         │
+        │                                              │
+        │   Host B3                                    │
+        │   192.168.2.4                                │
+        │                                              │
+        └──────────────────────────────────────────────┘
+
+
+
+if sender and receiver in same network then send datat through MAC ID or some times through the router
+> if in same network The data still physically travels through a switch/Wi-Fi access point in a typical LAN. It just doesn't go through the router as a Layer-3 gateway.
+how ? after check subnet mask , A1 knows A3's IP, but Ethernet needs a MAC address.
+So A1 uses ARP:
+
+A1
+192.168.1.2
+   │
+   │ ARP Broadcast:
+   │ "Who has 192.168.1.4?"
+   ▼
+┌───────────────┐
+│    SWITCH     │
+└───────────────┘
+   │      │
+   ▼      ▼
+  A2      A3
+          │
+          │ "That's me!"
+          │
+          ▼
+      MAC Address
+
+A3 responds:
+
+192.168.1.4 → AA:BB:CC:DD:EE:FF
+
+A1 stores that in its ARP cache.
+
+
+
+
+
+
+Vid 8 > what is MAC Address? 
+
+what > interface that connect with over the network like NIC, Ethernet cable, Bluetooth(shortrange), 
+now for this physical thngs we need a address that will be permanent.
+as ip can change in each time connection so we need a unique address for permanently
+Media Access Control Access)
+
+structure > : or - separated of hexadecimal number (fa:34:a5:90) Mac address are 6 bytes and each bytes have 2 hexa-decimal numbers
+
+first half are OUI Organisational unique identifier
+second half are physical pieces uniquely indentifier
+
+Vid 9 > IP vs MAC Address
+
+
+IP> 32 bit separated by dot | can change | 1st three for network resereved
+MAC > 48 bits separated by :or- | cant change | 1st three octed for org
+
+why need different > 
+one only work inside local network another helps to reach a local network
+
+vid 10 > ARP Works in network (Address resolution protocol)
+ARP table/cache  take IP and return MAC Address
+
+> link b/w IP and MAC, ARP request is a broadcast request that will reach to all and only one will respond
+> Every machine ARP table/cache so no need to breadcast using router each time 
+
+
+
+Vid 11 > What Makes OSI and TCP/IP Models Different
+
+Open System Interconnection 
+
+Levels :  Physical layer -> Datalink -> Network -> Transport -> Session -> PResentation -> Application
+
+Application Layer (Layer 7)>  HTTP,HTTPs,SMTP,IMAP,FTP,POP3,SSH protocols.
+softwares are the part of app layer.
+
+Presentation Layer > Encoding, Encryption, Serialization, JSON all transformation mostly.
+
+ 
+Session Layer > RPC/NETBIOS/Session Managament create a session between two apps to do certain tasks.
+work like a checkpoint to resume a download in between of signal break.
+
+Transport Layer > TCP/UDP/QUIC  here we also have concept of ports.
+also have concept of dataUnit in TCP-segment and in udp-datagram
+
+Network Layer > IP/ICMP - IP Address DataUnits: IP Packets
+
+Data Link Layer > MAC Address/Ethernet DataUnits: Frames
+
+Physical Layer > Electrical signal/ Radio waves/Fibre cables
+
+
+
+TCP/IP Model >
+Application + Presentation + Session > Application Layer
+other
+ then 2 as it is 
+then Datalink + Physical > Physical Layer
+
+TCP is the main practical of OSI Model (Conceptual).
+
+Level : Application -> Transport -> Internet -> Network Access
+
+
+
+Vid 12 > How Routing Determines Your Data's Journey Across Networks
+
+Router -> is layer 3 device search based on IP
+switch -> is a layer 2 device based on mac address take decision 
+
+Now assume from your home a device to send a req to ec2 service that time the source IP will be public Router IP change and in this way over the internet the mac and ip can be change.
+so Destination and src mac can change and Source IP only change in outside network
+
+vid 13 >What Happens When You PING Google? and ICMP
+Internet Control Message Protocol Layer 3 protocol, dont have ports as ports will be in layer 4 (TCP/UDP/QUIC)
+
+
+return ICMP error as HOST not rechanble, PORT is not Rechable, TTL error when infinity route in routers.
+
+How Ping internally works -> machine - Router - different router in Internet - Google.com [{local IP}{echo req, ttl}{google IP}]
+
+here time is till got response, ttl is the ttl for infinity routing
+
+
+
+Trace Route > tracert/traceroute shows all router patch  
+              send the ttl with 1 then 2 in increasing order and in this way each route give a TTL Exceed message and this way eventually reach destination
+
+
+if a Router ICMP block then it will not return the TTL error and shows "*", number of "*" that much router hopped
+----------------------------------UDP---------------------
+Vid 14 > Why UDP is fast 
+
+User Datagram Protocol (Transport layer protocol), Dataunit: Datagram, doesnot required connection establishment like 3 way handshake, header size of UDP only 8 bytes, its a statless protocol and have concepts of ports to address Processes in the host
+
+here packets also have PORTs(Souce and destination ports) with mac and IP address.
+
+Is only send the packet and forget about this packet, so no retry or dont care if destination dont have the internet window. Faster than TCP but unrelaiable.
+Used in Video calling and gaming all those.
+
+Uses UDP -> WebRTC, Gameplay Traffic, Video Streaming, VPN-Open VPN, DNS, Quic
+
+*VPN uses UDP for TCP meltdown issue.
+*Quic and DNS use UDP but have own Reliability protocol
+
+vid 15 > UDP datagram
+
+  0                         15 16                  31
+  ┌────────────────────┬────────────────────┐
+  │    Source Port           │        Destination Port  │
+  │      16 bits (2 bytes)   │            16 bits       │
+  ├────────────────────┼────────────────────┤
+  │       Length             │            Checksum      │
+  │      16 bits             │            16 bits       │
+  ├────────────────────┴────────────────────┤
+  │                                                     │
+  │                         DATA                        │
+  │                    Variable length                  │
+  │                                                     │
+  └─────────────────────────────────────────┘
+
+Let see the UDP Structure (Anatomy)
+ > Source and destination PORT, check sum and length creates Header each 2 bytes so 8 bytes
+ >  Data is the payload 
+
+
+
+vid 16 > UDP traffic with wireshark
+
+network theke je packets ase ogulo catch kore dekha jai wireshark diye.
+Uses google 8.8.8.8 DNS server for ISP
+DNS look up port 53 as default
+
+Practical > Wifi -> Ethernet -> Internet Protocol -> UDP -> DNS 
+          
+
+-------------------------------TCP----------------------------
+ vid 17 >  TCP Backbone
+
+- All important protocols based on TCP
+- it is a Layer 4 protocol, uses port number for identify the app in host machine.
+- Connection oriented protocol uses 3-way handshake (Syn-> syn-ack -> Ack)
+- Stateful protocol.
+- Uses 4 way termination process (Fin/ACK)
+- Data devided in segments
+- reliable and orderly manner of data.
+- Reciever send ACK for receive Data.
+- lost segments retransmiteed.
+- Slower than UDP
+
+-> Destination will actually make the order of segments 
+
+-> Uses cases : DB Connections, HTTP/REST API, FTP, EMail(SMTP,IMAP,POP3), SSH
+
+
+
+
+ vid 18 > 3 way handshake
+
+Establishment of connection 
+send also essential things like info of client and vicerversa (Window size, sequesnce number etc)
+TCP is stateful protocol i.e. Client and Server are aware of each other state
+  1. Clint ----SYN----> Server
+  2. Server -----SYN+ACK----> Client
+  3. client -----ACK------> server
+
+* in first call client also send seq intial number, window size, window scaling factor and the MSS in optional fields.
+
+ vid 19 > 4 way termination
+  
+  After all work when clients want to close connection it sends a "FIN" Request
+1. Client ----FIN---->Server
+2. Server ----ACK----->Client
+3. server ----FIN----->Client
+4. Client ----Ack-----> server
+
+
+> TCP connection is full-duplex, so each direction has to be shut down independently. as Server may have some task to complete.
+
+
+ vid 20 > TCP Seq and Ack number
+
+  Mostly the videos as for how they are reliable
+  
+ Seq Num (in 3 way handshake send intial seq number and mostly it will be random) 
+            TCPHELLOWORLD 
+                ------------- 13 bytes 
+                │ 
+                ▼ 
+          TCP segmentation 
+  ┌────────────┼────────────┐ 
+  ▼               ▼                ▼ 
+ TCP              HELLO            WORLD 
+ 1-3              4-8               9-13 
+ Seq 1            Seq 4             Seq 9
+
+
+
+Segment structure 
+                         TCP SEGMENT / TCP HEADER
+                    32-bit wide rows (0 → 31 bits)
+
+
+Bit:     0                   8                  16                 24                31
+         │                   │                   │                   │                 │
+         ▼                   ▼                   ▼                   ▼                 ▼
+         ┌───────────────────┬───────────────────┬───────────────────┬─────────────────┐
+         │                   │                   │                   │                 │
+         │      SOURCE PORT (16 bits)            │  DESTINATION PORT (16 bits)          │
+         │                   │                   │                   │                 │
+         ├─────────────────────────────────────────────────────────────────────────────┤
+         │                                                                             │
+         │                       SEQUENCE NUMBER (32 bits)                            │
+         │                                                                             │
+         ├─────────────────────────────────────────────────────────────────────────────┤
+         │                                                                             │
+         │                    ACKNOWLEDGMENT NUMBER (32 bits)                          │
+         │                                                                             │
+         ├──────────────┬───────────┬─────┬─────┬─────┬─────┬─────┬─────┬──────────────┤
+         │ Data Offset  │ Reserved  │ URG │ ACK │ PSH │ RST │ SYN │ FIN │              │
+         │   4 bits     │  3 bits   │  1  │  1  │  1  │  1  │  1  │  1  │ Window Size │
+         │              │           │     │     │     │     │     │     │  (16 bits)  │
+         ├─────────────────────────────────────────────────────────────────────────────┤
+         │                                                                             │
+         │                           CHECKSUM (16 bits)          │ URGENT POINTER      │
+         │                                                        (16 bits)            │
+         ├─────────────────────────────────────────────────────────────────────────────┤
+         │                                                                             │
+         │                         OPTIONS (0–320 bits)                                 │
+         │                         + Padding                                            │
+         │                                                                             │
+         ├─────────────────────────────────────────────────────────────────────────────┤
+         │                                                                             │
+         │                              DATA                                           │
+         │                         (Variable length)                                    │
+         │                                                                             │
+         └─────────────────────────────────────────────────────────────────────────────┘
+
+ACK Num
+ - Used to confirm successful receive of data, ack num contain next seq num
+ - Retransmission happened based on this
+ - receiver send ACK as(Seq num + byte = next seq num) send what i need next after search in me, ACK num means how much he have and next what need
+
+
+ vid 21 > Anatomy of TCP Segment
+
+
+                           IP PACKET
+┌──────────────────────┬─────────────────────────────────────────────────┐
+│                      │                                                 │
+│     IP HEADER        │                 TCP SEGMENT                      │
+│                      │                                                 │
+│  Source IP           │  ┌─────────────────────┬──────────────────────┐ │
+│  192.168.1.1         │  │    TCP HEADER       │       TCP DATA       │ │
+│                      │  │                     │                      │ │
+│  Destination IP      │  │ Source Port: 8000   │ SELECT * FROM users; │ │
+│  10.0.0.1            │  │ Dest. Port: 5432    │                      │ │
+│                      │  │                     │                      │ │
+└──────────────────────┴──┴─────────────────────┴──────────────────────┴─┘
+                         │
+                         │
+                         └────────────── TCP SEGMENT ────────────────────┘
+
+
+
+-> Source Port, Destination Port, Sequesnce Number, Ack Number already know
+then we have 
+ Data Offset -> (TCP Header) from where data is starting
+ Reserved -> (TCP Header) for future use , no use for now
+ Window Size ->(TCP Header) Reciever tells how much data i can candle
+ CWR -FIN ->(TCP Header)  all are flags [RST -> reset Server without gracefull (Fin is gracefull), PSH -> Push immediate send to app, ECE ->somerouter experience congestion, CWR -> for congestion window reduce , URG -> if enabled then urgent pointer will use not use much ]
+ Checksum -> (TCP Header) understand if in same network call or not
+ Urgent pointer -> (TCP HEader) 
+ OPtion -> (TCP Header) for optional uses [MSS, MTU, Window Scale, Timestamp, Select ACK support]
+
+
+
+ vid 22 > MTU MSS PMTUD
+  
+Maximum Transmission Unit (MTU) -> Largest IP Packet without fragmentation. includes IPHeader + TCP/UDP Header + Payload. Ethernet eader not part of it. different links can have different MTU. Excedding MTU can cause fragmentations or packet drops.
+MTU is there so we can avoid fragmentation, Keeping packets within the MTU avoids fragmentation, which can introduce additional headers, processing overhead, and packet-loss/retransmission inefficiency.
+
+Maximum Segment Size (MSS) -> TCP Only, Maximum TCP Payload in a single segment without TCP Header
+ - MSS = MTU - IP HEader - TCP HEader/
+ - Standard Ethernet MSS = 1460 bytes (No one remeber this shit)
+ - Advertised during TCP 3-Way handshake, carried in TCP MSS option, helps to avoid fragmentation
+
+ * MSS helps to make segments based on the mss and total data size
+
+ 
+ Path Maximum Transmission Unit Discovery (PMTUD) -> 
+   - Each router have an MTU through which segments hopps and go to the destination
+   - Mechanism to discover PMTU, prevent fragmentation
+   - Sender starts with larger packets,and router dropped oversized packets & send ICMP " Fragmentation needed" then sender reduce packet size and try again -> this way continue until packet passes successfully
+
+
+also during PMTU we set DF = 1  [means packet cant be fragment] so lower MTU router after receive a larger packet it will not fragment it , instead it drops and return ICMP "Fragmentation Needed"
+ 
+
+
+ vid 23 > TCP Flow control
+
+  Stop & Wait  -> send a packet and get next seq num as ack and then send next packet , this is ok when data is smaller but sending a 2GB data will cause issues and slow
+
+Cumulative ack : Instead we can send multiple segments at a time, then server send a single ack of next what it needs 
+ 
+  now how many need to send at a time decision take based on flow control.
+How much reaciver can handle and my sender can send?
+Flow Control -> Restrict snder to send not more than the amount that receiver cant handle.
+
+Window size -> helps to maintain flowcontrol, window size as the amount of data the receiver is currently willing to accept without sending another acknowledgment.
+after get a receiver sends cumulative ACK and current window size.
+receiver can also send another ACK with updated window size so client can send data now.
+
+
+> Sliging window technique also used in TCP for receive buffer
+  [not that much important]
+> WIndow scaling also there not needed
+
+
+ Vid 24 > TCP Congestion control
+
+  Flow control: Prevents the sender from overwhelming the receiver.
+  Congestion control: Prevents the sender from overwhelming the network. basically sender sends amount that router cant handle.
+
+
+sender window = min (congention window, recievers window)
+How to know Congestion window > detects congestion window using  try and error algorithm (Tcp Slow start, Assumption)   
+  
+There are congestion check algorithms and techniques as well.
+
+
+ Vid 25 > TCP with wireshark
+
+   Just see nothing to note
+
+
+-------------------------------Network Things-----------------
+Vid 26 > DNS Domain name system
+ > basic we all know babe, Store IP addresses like a name
+ This allow users to directing nearest server/CDN. This can also used for basic load balancing. Built on  top of UDP and run on port 53.
+DNS resolver -> server that give ip of the site based on Domain Name
+
+>Browser/Os also cache the DNS and IP 
+>Root Server , Top Level Domain server, Authorative Name Server return IP based on Domain, each used for each hierarchy (for calability and first response)
+
+Strucutre of a DNS
+api.example.com.
+│           │ │
+│           │ └── Root Zone: "." hidden by the browser
+│           │
+│           └────────── Top-Level Domain (TLD): .com (separated for .com, .in, .gov)
+│
+└────────────── Subdomain: api
+
+Domain: api.example.com
+
+hierarchy -> 
+                         Root (.)
+                           │
+          ┌────────────┼────────────┐
+          │                │               │
+        .com              .net             .in => Top level domain
+          │                                 │
+          ↓                                 ↓
+     github.com                      wajeshubham.in
+       │           │                            │
+       │           │                            │
+       ↓            ↓                            ↓
+api.github.com  app.github.com      blog.wajeshubham.in
+
+
+
+do from server first go to root server -> return ".com" or other based TLD servers TLD take GitHub.com and give ip of servers that handle GitHub.com -> go to authentic anme server give ip of the site
+
+Now DNS have A, AAA, Cname what are these?
+usually means -> 
+Record	Purpose	           Example
+A	Domain → IPv4	api.example.com → 1.2.3.4
+AAAA	Domain → IPv6	api.example.com → IPv6
+CNAME	Domain → Domain	www → example.com
+MX	Domain → Mail server	example.com → mail.google.com
+TXT	Text/verification/security info	example.com → SPF/verification
+
+
+
+vid 27 > Major DNS Record
+
+  DNS A Record
+   Most common DNS record 
+   What is IPv4 address of wajeshubham.in? DNS Replies: 3.111.187.148
+   (It may return one or more IPv6 addresses ig multiple A records present)
+   Multiple A records can exist (for load balancing/failover/high availability)
+
+    wajeshubham.in    3600    IN     A    3.111.187.149----> 2nd A record for same domain
+    TTL here have for cache of DNS Resolver
+
+
+
+
+
+
+DNS AAAA Record
+
+
+TTL (Seconds)                 Record Type (AAAA - Address Record (IPv6))
+      ↓                                      ↓
+wajeshubham.in    3600    IN    AAAA    2606:4700:90d2:7cbc:c29e:8b4:5ff2:75c4
+      ↓             ↓      ↓      ↓                    ↓
+  Hostname        TTL    Class   Record Type       IPv6 Address mapped
+                        (IN - Internet)             to wajeshubham.in
+
+• Used to map a domain/hostname to an IPv6 address
+
+• What is the IPv6 address of wajeshubham.in?
+  DNS Replies: 2606:4700:90d2:7cbc:c29e:8b4:5ff2:75c4
+
+  (It may return one or more IPv6 addresses)
+
+• Multiple AAAA records can exist
+  (for load balancing/failover/high availability)
+
+
+wajeshubham.in    3600    IN    AAAA    2606:4700:90d2:7cbc:c29e:8b4:5ff2:75c5
+                                            ↓
+                                  2nd AAAA record for same domain
+
+
+
+>as IPv4 -> 32bits and IPv6 -> 128bits (ie 32 * 4) thats why A*4 - AAAA
+
+ 
+
+
+
+
+
+DNS MX Record
+TTL (Seconds)                         Record Type
+      ↓                               (MX - Mail eXchange)
+wajeshubham.in    3600    IN    MX    10    smtp.secureserver.net
+      ↓             ↓      ↓      ↓     ↓           ↓
+  Hostname        TTL    Class   Record  Priority    Actual mail server
+                        (IN -    Type    /Preference responsible for
+                       Internet)                 receiving email
+
+
+DNS MX Record
+
+• Used by SMTP servers during email delivery
+• Lower preference value = Higher priority
+• Multiple MX records can exist for redundancy and failover
+• MX records contain hostnames, not IP addresses
+• SMTP servers perform A or AAAA lookups on the MX hostname
+  before connecting
+• If the highest-priority mail server is unavailable,
+  the next MX record is tried
+• MX records do not store emails,
+  they only show where emails should be delivered
+• Multiple MX records with the same preference
+  can be used for load balancing
+
+
+Workflow -> 
+
+              EMAIL DELIVERY USING MX RECORD
+
+Sender
+bob@gmail.com
+     │
+     │ 1. Send email
+     ▼
+hello@wajeshubham.in
+     │
+     │ 2. DNS Query:
+     │    "What are the MX records for wajeshubham.in?"
+     ▼
+    DNS
+     │
+     │ 3. DNS Response
+     ▼
+┌─────────────────────────────────────────────┐
+│ MX Records                                  │
+│                                             │
+│ 10 → smtp.secureserver.net                  │
+│ 20 → backup-mail-1.secureserver.net         │
+│ 50 → backup-mail-2.secureserver.net         │
+└─────────────────────────────────────────────┘
+     │
+     │ 4. Try lowest priority number first
+     ▼
+┌─────────────────────────────────────────────┐
+│ 10 → smtp.secureserver.net       ← FIRST    │
+└─────────────────────────────────────────────┘
+     │
+     │ If it fails
+     ▼
+┌─────────────────────────────────────────────┐
+│ 20 → backup-mail-1.secureserver.net         │
+└─────────────────────────────────────────────┘
+     │
+     │ If it also fails
+     ▼
+┌─────────────────────────────────────────────┐
+│ 50 → backup-mail-2.secureserver.net         │
+└─────────────────────────────────────────────┘
+     │
+     ▼
+  5. Mail Delivered
+     │
+     ▼
+hello@wajeshubham.in
+
+
+IMPORTANT:
+
+MX Priority:
+Lower number = Higher priority
+
+Before connecting to the selected MX hostname:
+
+MX hostname
+     ↓
+A / AAAA DNS lookup
+     ↓
+Get IPv4 / IPv6 address
+     ↓
+SMTP connection
+     ↓
+Send email
+
+
+DNS CNAME Records
+
+blog.wajeshubham.in    3600    IN    CNAME    hashnode.network
+       ↓                  ↓      ↓      ↓            ↓
+    Hostname             TTL   Class  Record Type   Target Domain Name
+                               (IN - Internet)
+
+
+CNAME stands for Canonical Name Record
+• Maps a hostname to another hostname, not directly to an IP address.
+• The target hostname must eventually resolve to an A or AAAA record.
+
+
+Example:
+
+What is the A record of blog.wajeshubham.in?
+        ↓
+"I don't have an A record.
+ I have a CNAME record."
+        ↓
+blog.wajeshubham.in
+        ↓ CNAME
+hashnode.network
+        ↓ A
+1.2.3.4
+
+
+So:  blog.wajeshubham.in → CNAME → hashnode.network → A → 1.2.3.4
+
+
+
+
+
+NS Records
+wajeshubham.in.    172800    IN    NS    dns1.p07.nsone.net.
+wajeshubham.in.    172800    IN    NS    dns2.p07.nsone.net.
+wajeshubham.in.    172800    IN    NS    dns3.p07.nsone.net.
+wajeshubham.in.    172800    IN    NS    dns4.p07.nsone.net.
+
+       ↓              ↓       ↓     ↓            ↓
+   Hostname         TTL     Class  Record Type   Name Server
+                           (IN -   (NS - Name
+                          Internet)   Server)
+
+
+DNS NS Record
+
+• NS stands for Name Server
+• It tells the internet which DNS servers are authoritative for a domain
+• Without NS records, resolvers would not know where to find a domain's DNS records
+• A domain usually has multiple name servers for redundancy and high availability
+
+
+
+
+TXT records
+
+wajeshubham.in    3600    IN    TXT    "v=spf1 include:secureserver.net -all"
+       ↓             ↓      ↓      ↓              ↓
+   Hostname        TTL    Class  Record Type     TXT Value
+                        (IN -   (TXT - Text)
+                       Internet)
+
+
+DNS TXT Record
+
+• TXT (Text) record stores arbitrary text information for a domain
+• Originally designed for human-readable notes, now widely used for
+  verification and security
+• Commonly used for SPF, DKIM, DMARC, etc.
+• A domain can have multiple TXT records
+• TXT records don't affect website routing;
+  they provide information to applications and services
+• DNS stores the TXT value as text,
+  but applications decide what it means
+
+
+
+
+
+
+DNS PTR Record
+
+• PTR records are used for reverse DNS lookups
+• PTR records map IP Address → Hostname
+• Opposite of A and AAAA records
+• Usually configured by the IP address owner, not the domain owner
+  (Cloud Providers/ISPs etc)
+• A missing PTR record does not stop a website from working,
+  but it can negatively affect the reputation of a mail server
+  sending emails
+
+
+> For backend interviews: remember DNS → UDP 53 by default; TCP 53 when needed.
+
+
+vid 28 > DNS with wireshark
+   JUST Watch not needed to note
+
+
+Vid 29 > HTTP
+ HyperText -> a text that may have a hyperlink that point another doc/hypertext
+ 
+ Built on Top of TCP & is a Application Layer protocol, define how req and res looks and exchanged between client and server. It is stateless, doesnot encrypt data, doesnot gurantee delivery(TCP/QUIC handles transport), independent of programming languages.
+
+> HTTP 0.9 is the first version only serve html dont have concept of header. (Only HTML Template)
+> Modern HTTP is media independent that is support every type content.
+
+
+vid 30 > HTTP 1.0 and 1.1
+ Introduce headers and contenttype.
+               3way connection and 4 wat termination for each call. tahst is a overhead and for that we created HTTP 1.1. default send keep-alive. but here until get response cant send next req.
+now we have Http 1.1 pipelining here can send multiple req but response will always come on same prder the req are fired.
+This is HEad off line blocking, thats why disabled by default.
+
+
+
+vid 31 > Http REQ and RES Structure
+   only watch not need to note
+
+   Understand the Etag only and note it.
+
+vid 32 > HTTP 1.1 in Action
+       only watch and understand nothing note that much.
+     
+       between two API call server keep calls for a keep alive ping to check if connection already there or not?
+
+
+
+
+vid 33 > HTTP 1.1 head of line blocking in action
+     understand first.
+      
+     browser itself create more than 1 TCP connections(6 mostly in chrome) to solve this head of line blocking issues from browsers end. 
+
+
+vid 34 > HTTP 2 Overview
+for the "head of line blocking" issues we made HTTP 2.
+now HTTP 2 uses single tcp coneection but over a connection multiplex-multiple req & res. for uniqueness each will have a Stream ID.
+here orders not matter so it solves head of line issue.
+
+
+Other features -> 
+ 1. Server push (modern browser desable it)> when do a get req it returns html then js and css res one by one. [not use for now]
+   here browser when do req alway add a odd num as stream id and server do it always even.
+ 
+
+2. In HTTP 2 TLS is Must
+
+vid 35 > HTTP 2 frames
+Http 2 have own data unit calls frame -> and mostly break in header frame and data frame.
+
+
+HTTP/2 — Multiple Requests over a Single TCP Connection
+
+
+Request 1
+
+POST /api/v1/users
+Host: api.freeapi.app
+Accept: application/json
+Content-Type: application/json
+Content-Length: 120
+
+{
+  "name": "Shubham",
+  "phone": "9876543210",
+  "id": 10,
+  "is_email_verified": false,
+  "email": "shubham@abc.com"
+}
+
+
+HEADERS Frame
+
+stream_id=1
+[..., other frame headers]
+
+:method=POST
+:path=/api/v1/users
+:authority=api.freeapi.app
+accept=application/json
+content-type=application/json
+content-length=120
+
+[Above headers are HPACK compressed]
+
+
+DATA Frame
+
+stream_id=1
+[..., other frame headers]
+
+{
+  "name": "Shubham",
+  "phone": "9876543210",
+  "id": 10,
+  "is_email_verified": false,
+  "email": "shubham@abc.com"
+}
+
+
+Request 2
+
+GET /api/v1/orders
+Host: api.freeapi.app
+Accept: application/json
+
+
+HEADERS Frame
+
+stream_id=3
+[..., other frame headers]
+
+:method=GET
+:path=/api/v1/orders
+:authority=api.freeapi.app
+accept=application/json
+
+[Above headers are HPACK compressed]
+
+
+Request 3
+
+GET /index.html
+Host: api.freeapi.app
+Accept: text/html
+
+
+HEADERS Frame
+
+stream_id=5
+[..., other frame headers]
+
+:method=GET
+:path=/index.html
+:authority=api.freeapi.app
+accept=text/html
+
+[Above headers are HPACK compressed]
+
+
+Single TCP Connection
+
+Browser
+   │
+   ├── DATA Frame      (SID 1)
+   ├── HEADERS Frame   (SID 5)
+   ├── HEADERS Frame   (SID 3)
+   └── HEADERS Frame   (SID 1)
+   │
+   ▼
+Server
+
+
+Key:
+SID = Stream ID
+HTTP/2 uses multiple independent streams over a single TCP connection.
+
+
+Structure of frame 
+32 bits (4 bytes)
+0                                      31
+┌─────────────────────────────────────────┐
+│ Payload Length in bytes (24 bits)   │ Type (8 bits) │
+├───────────────┬─────────────────────────┤
+│ Flags (8 bits)│                         │
+├───────────────┴─────────────────────────┤
+│ Reserved (1 bit) │ Stream ID (31 bits)  │
+├─────────────────────────────────────────┤
+│                                         │
+│              Frame Payload              │
+│                                         │
+│  Payload size is determined by the      │
+│  above Payload Length field             │
+└─────────────────────────────────────────┘
+
+vid 36 > why http 2 is binary protocol
+
+HTTP/2 is called a binary protocol because it does not send HTTP messages as plain, human-readable text like HTTP/1.1 does.
+
+HTTP/1.1 — text-based
+A request looks roughly like:
+GET /users HTTP/1.1
+Host: example.com
+Content-Type: application/json
+Connection: keep-alive
+
+
+
+You can literally open a TCP connection and read this as text.
+
+
+HTTP/2 — binary framing
+HTTP/2 converts communication into binary frames.
+HTTP/2 sends structured binary data representing things like:
+
+HEADERS frame
+DATA frame
+SETTINGS frame
+WINDOW_UPDATE frame
+PING frame
+...
+Why did HTTP/2 do this?
+Mainly because it makes the protocol more efficient and easier for machines to parse.
+also all data stays in HPACK or other url encoding.
+
+
+vid 37 > HPACK explained
+compression encoding  technique for http2, it is a lossless compression technique.
+
+HPACK compresses HTTP/2 headers using two main ideas:
+Static table — predefined common headers. (61 mostly)
+Dynamic table — remembers headers that have already been sent. like a queue form 62 and give a size of 4kb.
+
+
+Important 
+HTTP/1.1 → no HPACK
+HTTP/2   → HPACK
+HTTP/3   → QPACK
+> both HPACK and QPAck for header only not body
+
+
+HTTP -> ASCII/UTF-8 -> HPACK
+> Huffman is there for encoding , now in network we can send hpack or Huffman encoding for bytes conversion which is optional as -> 
+String
+  ↓
+HPACK
+  ├── Static/Dynamic Table lookup
+  │      ↓
+  │   If match → send index
+  │
+  └── If literal value needed
+          ↓
+       Huffman encoding (optional)
+          ↓
+       Bytes
+          ↓
+       HTTP/2 frame
+
+
+
+
+
+video 38> HTTP2 Head of Line blocking
+Understant HTTP 1.1 on application request level Head of Line blocking
+now using HHTP 2 it only solved request level head of line blocking but still we have TCP level HEAD of line blocking
+
+
+                    Single TCP Connection
+────────────────────────────────────────────────────────
+
+Browser                                      Server
+
+┌─────────────────┐
+│  HEADERS Frame  │
+│    (SID 1)      │
+└─────────────────┘
+        │
+        ├── seg 1 ────────────────→ ✅ Reached
+        ├── seg 2 ────────────────→ ✅ Reached
+        ├── seg 3 ────────────────→ ✅ Reached
+        └── seg 4 ────────────────→ ✅ Reached
+                                      Application received
+                                      Seg 1 to 4, waiting for
+                                      further segments...
+
+┌─────────────────┐
+│   DATA Frame    │
+│    (SID 1)      │
+└─────────────────┘
+        │
+        ├── seg 5 ────────────────→ ❌ Missing
+        │                           TCP cannot deliver
+        │                           segments 6–12 until
+        │                           segment 5 is retransmitted.
+        │
+        ├── seg 6 ────────────────→ 🕐 Buffered by TCP
+        ├── seg 7 ────────────────→ 🕐 Buffered by TCP
+        └── seg 8 ────────────────→ 🕐 Buffered by TCP
+
+┌─────────────────┐
+│  HEADERS Frame  │
+│    (SID 5)      │
+└─────────────────┘
+        │
+        ├── seg 9  ───────────────→ 🕐 Buffered by TCP
+        ├── seg 10 ───────────────→ 🕐 Buffered by TCP
+        ├── seg 11 ───────────────→ 🕐 Buffered by TCP
+        └── seg 12 ───────────────→ 🕐 Buffered by TCP
+
+
+until get seg 5 the server cant get others
+this is why HTTP 3 will have QUIC instead of TCP, basically they change the transport.
+
+
+
+Video 39 > QUIC Protocol
+- similar to TCP, Transport layer protocol runs over UDP, foundation of http3. reliable delivery like TCP.
+- TLS 1.3 use automatically include inside quic.
+- Faster evaluation compared to TCP as OS updates not required, also apps like chrome cloudflare nginx have their own quic implementation.
+- implemented in user space, not inside OS kernel. => TCP/UDP update needs os update to all machine thats why QUIC implemented in user space.
+
+
+Now why Quic uses UDP under hood not make it a direct TCP/UDP like one ?
+
+Protocol ossification means the Internet infrastructure has become so optimized for TCP and UDP that introducing a completely new transport protocol is difficult.
+ -Routers, firewalls, and NATs expect TCP or UDP.
+ -A new protocol may be blocked or handled incorrectly.
+ -QUIC solves this by running inside UDP.
+ -So, network devices simply see normal UDP traffic and forward it.
+ -QUIC can then be improved/updated by applications without waiting for OS vendors, router manufacturers, or network upgrades.
+
+Quic Handshake >
+in normal we do a TCP handshake then TLs handshake(1+1 RTT) but in quic
+1st handskae req > transport and TLs both send
+2ns handshake req > same form server
+takes 1 RTT.
+
+It also have a 0 RTT thing , ie in first connection will get a session ticket and then again reconnect just send session ticket thats why 0 RTT.
+but bcz of security this only do for GET and HEAD.
+
+
+
+Other > switching network TCP connection changes like in wifi but then swict to celuler data - it is bcz TCP uses source code & IP and Destination Code & IP to indentify. but in quic we have a separate QUIC connection ID.
+
+ 
+video 40 > HTTP 3 how to use in quic
+
+ -simila http2 at the application level, it uses quic streams
+ - uses http2 frames as DATA and HEADERS
+ -TCP level Head-of-line blocking is eliminated
+ - loss of one quic streams doesnot block delivery of data from other streams
+ - uses qpack instead http2 hpack and TLs1.3 integrated into quic
+
+
+How it solves http line blocking ?
+> HTTP/2 has multiple streams, but ALL streams share one TCP connection.
+HTTP/3 uses QUIC instead of TCP.
+
+quic have differente type of frames like crypto, stream and acknowledge frame, http mostly ueses stream frames.
+QUIC provides independent streams:
+
+    QUIC CONNECTION
+    ┌─────────────────────────────┐
+    │ Stream 1 → [A][B][C][D]     │
+    │ Stream 2 → [E][F][G]        │
+    │ Stream 3 → [H][I]           │
+    └─────────────────────────────┘
+
+Suppose Stream 1 loses [B]:
+    Stream 1 → [A][X][C][D]
+                ↑
+               LOST
+
+Only Stream 1 waits:
+    Stream 1 → BLOCKED , will retransmit for sure
+    Stream 2 → CONTINUES ✓
+    Stream 3 → CONTINUES ✓
+
+
+
+
+
+
+video 41 > TLS Overview
+TLs--> Transport layer secret , HTTPS= HTTP+TLS
+main goal -> confidentiality, integrity(Immutable in between), Authenticated.
+In between of app and transport layer.
+Two major encryptions are there 
+  - Asymmetric encryption -> encrypt and decrypt two keys
+  - Symmetric encryption  -> encrypt and decrypt with one key
+TLS handshake use both.
+
+
+
+
+Video 42 > Maths behind RSA algo
+RSA Algo (Rivest Shamir Adleman) : 
+- RSA keys structure
+	- Public Key = (e, N)
+	- Private Key = (d, N) where,
+	- e is public exponent
+	- d is private exponent
+	- N is RSA modulus
+
+Encryption : MESSAGE^e mod N = CIPHERTEXT
+Decryption : CIPHERTEXT^d mod N = MESSAGE
+- MESSAGE = Original Message
+- CIPHERTEXT = Encrypted Message
+- e = RSA public key exponent
+- d = RSA private key exponent
+- N = RSA Modulus
+
+
+
+
+video 43 > TLS certification
+
+TLS Certificate
+- Digital certificate used to establish the identity of a server
+- Binds a domain name to server's public key
+- Issued and digitally signed by a Certificate Authority (CA)
+- Contains information such as domain, public key, issuer, validity period, and CA signature
+- Used during the TLS handshake to authenticate the server and establish a secure connection
+
+> Generating a TLS certificate:
+A. Server who wants the certificate (e.g. ssw.in)
+- Create Public/Private key pairs
+- Create Certificate Signing Request (CSR)
+- Submit CSR to CA
+	The CSR contains the server's public key
+	The private key stays with the server
+- Deliver signed certificate and install it on server
+
+B. Certificate Authority (CA) e.g. Let's Encrypt
+- Construct tbsCertificate (To Be Signed Certificate)
+	Adds Subject Public Key, Issuer Name, Validity, Extensions, etc.
+- Serializes and encode the certificate using
+	ASN.1 (Abstract Syntax Notation One) and
+	DER (Distinguished Encoding Rules)
+- Sign with CA's Private Key
+	Right side flow: To Be signed Certificate -> ENCODE (ASN.1, DER) -> DER-encoded TBSCertificate bytes -> Sign DER-encoded TBSCertificate using CA's Private Key
+- Final X.509 Certificate (tbsCertificate + Signature Algo. + Signature)
+
+C. Final Assembly
+- Assemble Final X.509 Certificate = tbsCertificate bytes + signatureAlgorithm + signature
+
+> Verifying TLS certificate from the image:
+Flow:
+- User visits ssw.com in the browser
+- TLS handshake begins, Server sends its certificate chain
+- Server returns the certificate (leaf certificate (own) + required intermediate CA certificates)
+- Parse the certificate into:tbsCertificate bytes, signatureAlgorithm, Actual signatureValue (signed using issuer's (CA) Private Key)
+- Verify signature using issuer's (CA) Public Key
+	Note: The signature was created using the issuer's private key, the issuer public key is used to verify it
+- If the signature is verified, means it was indeed signed by the issuer (CA)
+- Repeat certificate verification up the chain until a trusted root CA is reached.
+Other certificate checks:SAN / hostname Validity period Other constraints 
+
+Chain of trust => verify till Rot certificate (self signed of cert), browser and os knows about this certificate
+
+
+
+
+
+
+video 44 > Maths behind Diffie hellman
+Diffie-Hellman (Whitfield Diffie and Martin Hellman)
+- Key exchange protocolUses publicly known parameters: prime p and generator g
+- Based on the Discrete Logarithm Problem
+- ECDHE is the modern elliptic-curve variant widely used in TLS
+- Diffie-Hellman is key exchange algo, not message encryption
+
+Basic Diffie-Hellman example to get a symmetric key.
+We want a shared secret, but we are on an untrusted network. We can only send public values.
+1. Public parameters (everyone knows):
+	Prime p = 23	
+	Generator g = 5
+2. Private secrets (never shared):
+	Alice picks private a = 6
+	Bob picks private b = 15
+3. They calculate their Public Keys to exchange:
+		Alice: A = g^a mod p = 5^6 mod 23 = 15625 mod 23 = 8
+		Bob: B = g^b mod p = 5^15 mod 23 = 19
+	They exchange A=8 and B=19 over the open network. An attacker sees 8 and 19, but can't get a or b because of the Discrete Logarithm Problem.
+4. They calculate the SAME shared secret:
+	Alice computes: Secret = B^a mod p = 19^6 mod 23 = 2
+	Bob computes: Secret = A^b mod p = 8^15 mod 23 = 2
+	Shared Secret = 2
+This 2 is now the symmetric key. 
+In real TLS, this number is much bigger (2048-bit) and then passed through a Key Derivation Function (KDF) to create the actual AES session key.
+This is why DH is a key exchange algo, not encryption. It just lets both sides agree on the same symmetric key securely.
+
+
+
+
+video 45 > TLS 1.2 handshake
+
+- to share symmetric keys b/w client and server
+- rsa => authentication, digital signature, key exchange
+- TLS 1.2 handshake
+	Client Hello		------>                               Server
+	Client       		<------                               Server Hello
+	Client    <--Certificate (has server public key)----      Server
+	Client       		<------                               Server Hello Done
+Server public key,generated by client, pre-master secret (48 bytes) 
+	Client       		---Client Key Exchange (RSA) --->     Server gets pre-master secret
+
+PRF => Psuedo Random Number	
+pre-master secret -> PRF -> Master Secret -> PRF -> session keys -> Client session key & Server session key
+				-------------- Change Cipler Spec ------------>
+	Client generate finish message   ----- Client finish -----> Encrypted finished message -> Server decrypts using client session key -> get the finsih message -. server also calculates its version of finsihed message -> keys are valid
+	---- same step will be done from server side to client 
+
+
+
+
+
+video 46 > TLS 1.3 handshake
+
+> TLS 1.2 vs TLS 1.3
+
+1. Simplified Cipher Suite
+
+In TLS 1.2
+TLS_RSA_WITH_AES_128_CBC_SHA256
+TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+...
+
+Key Exchange: RSA
+Authentication: RSA
+Symmetric Encr.: AES-128-CBC
+Hashing: SHA-256
+
+In TLS 1.3
+Symmetric Encr.: AES-128-GCM
+Hashing: SHA-256
+
+Simpler Cipher Suites
+TLS_AES_128_GCM_SHA256
+TLS_AES_256_GCM_SHA384
+TLS_CHACHA20_POLY1305_SHA256
+...
+Client sends signature algo and key exchange algo in extension separately
+
+2. RSA hash key exchange algo is not used in TLS 1.3
+3. 
+
+
+TLS 1.3 Hnadshake
+	Client Hello		------>      Server
+	Client       		<------      Server Hello
+	
+	Both sides compute shared secret using their private DH key + other's public share
+	shared secret -> HKDF Extract -> Handshake Secret
+	Handshake Secret derives Handshake Traffic Secrets (used to encrypt handshake)
+	Handshake Secret derives Master Secret
+	Master Secret derives Application Traffic Secrets (used for actual data)
+	
+	HKDF -> HMAC (extract/expand) based key derivation function
+	
+	Client: a (private) + Bk (server public) -> shared secret -> HKDF -> Handshake Secret -> derives Client/Server Handshake Secrets -> derives Master Secret -> derives Client/Server Application Secrets.
+	Use:Handshake Secrets = encrypt handshake after ServerHelloApp Secrets = encrypt real data
+	
+Forward Secrecy => Even if an attacker obtains the server's long-term private key later, they cannot decrypt previously captured HTTPS/TLS sessions.
+
+Ex:
+Without Forward Secrecy:
+Session 1 → encrypted traffic → Attacker captures it
+                         ↓
+              Server private key stolen later
+                         ↓
+              ❌ Old traffic can be decrypted
+			  
+With Forward Secrecy:
+Session 1 → temporary session key → encrypted traffic
+                         ↓
+              Private key stolen later
+                         ↓
+              ✅ Old traffic remains protected		
+
+TLS 1.3 handshake with diffie hellman Ephemeral as key exchangeAlgo
+
+
+
+
+
+video 47 > NAT explained
+NAT (Network Address Translation)
+• IPv4 addresses are limited to 4 billion
+• IPv4 address can be private (192.168.x.x / 10.x.x.x) or public (8.8.8.8)
+• NAT is primarily used to allow multiple private devices
+  to share a public IPv4 address
+• Types: Static NAT, Dynamic NAT, PAT/NAPT
+
+A - 10.0.0.1 -> Router (10.0.0.10) -> Public IP 2.3.4.5
+B - 10.0.0.2 -> Router (10.0.0.10) -> Public IP 2.3.4.5
+C - 10.0.0.4 -> Router (10.0.0.10) -> Public IP 2.3.4.5
+D - 10.0.0.5 -> Router (10.0.0.10) -> Public IP 2.3.4.5
+
+Router / Gateway: 10.0.0.10 (Private) / 2.3.4.5 (Public)
+
+          HOME / PRIVATE NETWORK
+     
+  PC A                          PC C
+10.0.0.1:3000                10.0.0.4:3000
+      │                            │
+      └──────────┐    ┌────────────┘
+                 ▼    ▼
+              ┌─────────┐
+              │  Router │
+              │ NAT/PAT │
+              └────┬────┘
+                   │
+          Public IP: 2.3.4.5
+                   │
+                   ▼
+                Internet
+                   │
+                   ▼
+              8.8.8.8:53
+			  
+What happens?
+
+Suppose 10.0.0.4:3000 wants to contact 8.8.8.8:53.
+
+The router changes:
+
+Before NAT:
+10.0.0.4:3000  →  8.8.8.8:53
+
+After NAT:
+2.3.4.5:5555   →  8.8.8.8:53
+
+The router stores this mapping:
+
+NAT TABLE
+
+Private              Public              Destination
+---------------------------------------------------------
+10.0.0.4:3000   →   2.3.4.5:5555   →   8.8.8.8:53
+10.0.0.1:3000   →   2.3.4.5:3000   →   8.8.8.8:53
+
+Notice that both private devices can use the same public IP 2.3.4.5, because the router distinguishes their connections using different port numbers.
+
+Response
+8.8.8.8:53
+     │
+     ▼
+2.3.4.5:5555
+     │
+     │ Router checks NAT table
+     ▼
+10.0.0.4:3000
+
+So the key idea is:
+PAT/NAPT = One public IP + different port numbers → multiple private devices can communicate with the Internet.
+
+
+
+
+video 48 > IP packet anatomy
+
+
+                         IPv4 Packet (Data Unit of IP)
+┌──────────────────────┬──────────────────────┬──────────────────────┬──────────────────────┐
+│   1st Byte (0–7)     │   2nd Byte (8–15)   │   3rd Byte (16–23)  │   4th Byte (24–31)  │
+├──────────┬───────────┼──────────────────────┼──────────┬───────────┼──────────────────────┤
+│ Version  │ IHL (≥5)  │        DSCP |  ECN   │         Total Length                        │
+├──────────┴───────────┴──────────────────────┴──────────┴───────────┴──────────────────────┤
+│     Identification                          │ Rsvd │  DF  │  MF  │    Fragment Offset     │
+├───────────────────────────────┬──────────────────┴──────┴──────┴───────────────────────────┤
+│             TTL      │    Protocol          │ Header Checksum                              │
+├───────────────────────────────┴──────────────────────────────────────────┴─────────────────┤
+│                                  Source Address                                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                Destination Address                                          │
+└─────────────────────────────────────────────────────────────────────────────────────────────┘
+
+1. Version: Tells the receiver which version of IP is being used.
+	IPv4 → 4
+	IPv6 → 6
+	
+2. IHL — Internet Header Length
+Tells the size of the IPv4 header.
+IHL = 5 → minimum header size = 20 bytes
+IPv4 can have optional fields.
+
+3. DSCP — Differentiated Services Code Point
+Used for traffic classification/prioritization. Routers can use DSCP to decide how traffic should be handled.
+
+4. ECN — Explicit Congestion Notification
+Used to indicate network congestion without necessarily dropping packets.
+Instead of: Congestion → Drop packet
+ECN can allow devices to communicate: "Network is becoming congested"
+The sender can then reduce its sending rate.
+
+5.Total Length: Specifies the total size of the IPv4 packet. Includes: Header + Data
+Maximum IPv4 packet size: 65,535 bytes
+
+6. Identification : Mainly related to fragmentation.
+If a large IP packet needs to be broken into smaller pieces:
+Original packet
+       ↓
+ ┌─────┬─────┬─────┐
+ │ F1  │ F2  │ F3  │
+ └─────┴─────┴─────┘
+All fragments have the same Identification value, allowing the destination to know: "These fragments belong to the same original packet."
+
+7. Flags: Controls fragmentation.
+Important flags:
+	> DF — Don't Fragment = 1, means: Don't fragment this packet.
+		If the packet is too large for the next network and fragmentation isn't allowed, it can be dropped.
+	> MF — More Fragments = 1, means:  more fragments are coming. The last fragment has: MF = 0
+	
+8. Fragment Offset: Tells the receiver where this fragment belongs in the original packet.
+Example: Original: [A B C D E F G H]
+After fragmentation: Fragment 1 → [A B C], Fragment 2 → [D E F], Fragment 3 → [G H]
+The fragment offset helps the receiver put them back in the correct order.
+
+9. TTL — Time To Live :  Prevents packets from circulating forever.
+Example: TTL = 64
+Router 1 → TTL = 63
+Router 2 → TTL = 62
+Router 3 → TTL = 61
+...
+
+Each router decreases TTL by 1.
+When TTL reaches 0, the packet is discarded.
+This protects the network from routing loops:
+Router A → Router B
+    ↑          ↓
+    └──────────┘
+Without TTL, a packet could potentially loop indefinitely.
+
+10. Protocol: Tells IP which upper-layer protocol should receive the payload.
+Common values: TCP   → 6, UDP   → 17, ICMP  → 1
+For example:
+IPv4 Packet
+     │
+     ├── Protocol = 6
+     ↓
+    TCP
+So the receiver knows how to interpret the data.	
+
+11. Header Checksum: Used to detect errors in the IPv4 header.
+	Important: It checks the header, not the payload.
+	Routers also recalculate it because fields such as TTL change at every hop.
+Router
+  ↓
+TTL changes
+  ↓
+Header checksum recalculated
+
+12. Source Address: The IP address of the sender.
+13. Destination Address: The IP address of the intended receiver.
+14. Data / Payload: Actual data being carried by the IP packet.
+For example:
+IPv4
+ │
+ └── Payload
+      │
+      └── TCP segment
+           │
+           └── Application data
+Or:
+IPv4
+ │
+ └── UDP segment
+
+
+
+
+
+
+video 49 > ip4 wireshark   ---No Notes ----
