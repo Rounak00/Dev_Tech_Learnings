@@ -1220,8 +1220,8 @@ RSA Algo (Rivest Shamir Adleman) :
 	- d is private exponent
 	- N is RSA modulus
 
-Encryption : MESSAGE^e mod N = CIPHERTEXT
-Decryption : CIPHERTEXT^d mod N = MESSAGE
+Encryption : MESSAGE^e mod N = CIPHERTEXT -> Public Key
+Decryption : CIPHERTEXT^d mod N = MESSAGE -> Private Key
 - MESSAGE = Original Message
 - CIPHERTEXT = Encrypted Message
 - e = RSA public key exponent
