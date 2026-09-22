@@ -1327,7 +1327,7 @@ video 45 > TLS 1.2 handshake
 
 - to share symmetric keys b/w client and server
 - rsa => authentication, digital signature, key exchange
-- TLS 1.2 handshake
+- TLS 1.2 handshake [here hello means some infos like random number, cipher suite etc...]
 	Client Hello		------>                               Server
 	Client       		<------                               Server Hello
 	Client    <--Certificate (has server public key)----      Server
@@ -1340,6 +1340,14 @@ pre-master secret -> PRF -> Master Secret -> PRF -> session keys -> Client sessi
 				-------------- Change Cipler Spec ------------>
 	Client generate finish message   ----- Client finish -----> Encrypted finished message -> Server decrypts using client session key -> get the finsih message -. server also calculates its version of finsihed message -> keys are valid
 	---- same step will be done from server side to client 
+
+> Total 2 Roundtrip.
+
+> so both side will have 2 keys Client session and server session keys >
+where clinet session key use client side encryption and server side will do decryption using it.
+Vice versa for server session key.
+ao if one key also leaked then only half data compromise.
+
 
 
 
@@ -1409,7 +1417,7 @@ Session 1 → temporary session key → encrypted traffic
               ✅ Old traffic remains protected		
 
 TLS 1.3 handshake with diffie hellman Ephemeral as key exchangeAlgo
-
+        so even handshake mesaages also stays encrypted.
 
 
 
