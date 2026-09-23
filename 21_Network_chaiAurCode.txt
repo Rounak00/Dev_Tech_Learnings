@@ -1496,7 +1496,10 @@ PAT/NAPT = One public IP + different port numbers → multiple private devices c
 
 
 
-video 48 > IP packet anatomy
+
+
+
+video 48 > IP packet anatomy (IP V6 Packaets header is a lil different than IP V4)
 
 
                          IPv4 Packet (Data Unit of IP)
