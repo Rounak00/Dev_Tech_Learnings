@@ -1428,7 +1428,7 @@ NAT (Network Address Translation)
 • IPv4 address can be private (192.168.x.x / 10.x.x.x) or public (8.8.8.8)
 • NAT is primarily used to allow multiple private devices
   to share a public IPv4 address
-• Types: Static NAT, Dynamic NAT, PAT/NAPT
+• Types: Static NAT, Dynamic NAT, PAT/NAPT (most home routers use this one)
 
 A - 10.0.0.1 -> Router (10.0.0.10) -> Public IP 2.3.4.5
 B - 10.0.0.2 -> Router (10.0.0.10) -> Public IP 2.3.4.5
